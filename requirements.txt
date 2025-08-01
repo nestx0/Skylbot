@@ -1,0 +1,4 @@
+discord.py
+python-dotenv
+jokeapi
+Flask>=2.0.0
