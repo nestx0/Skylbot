@@ -66,7 +66,7 @@ async def on_member_join(member):
 @bot.event
 async def on_message(message):
 
-    global lastTimeGIF, mio_activo, mio_reclamado
+    global lastTimeGIF, mio_activo, mio_reclamado, tiempo_of_las_mio
 
     now = time.time()
     peruano = random.randint(1,500)
