@@ -33,7 +33,7 @@ mio_activo = False
 mio_reclamado = False
 tiempo_of_las_mio = 0
 
-bot = commands.Bot(command_prefix='*', intents=intents)
+bot = commands.Bot(command_prefix='/', intents=intents)
 
 activities = itertools.cycle([
     "🏓 Ping pong",
@@ -354,5 +354,6 @@ async def mine(ctx):
 
 keep_alive()
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
 
 
