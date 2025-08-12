@@ -243,7 +243,7 @@ async def pay(ctx,member: discord.Member, amount:int):
         updateUser(ctx.author.id, balance)
         updateUser(user_id,otherBalance+amount)
         await ctx.send(f"Succesfully sent {amount} to {member.display_name}")
-@bot.command()
+@bot.command(help="Hit big or go home")
 async def roulette(ctx, amount: str = None, choice: str = None):
     
     options = ["red","black","green","1st","2nd","3rd","half1","half2"]
@@ -286,7 +286,7 @@ async def roulette(ctx, amount: str = None, choice: str = None):
             else:
                 await ctx.send(f"Number chosen was {result} {decor}, better luck next time")
 
-@bot.command()
+@bot.command(help="A lil game of rock, paper, scissors")
 async def ppt(ctx, amount: str = None):
 
     balance = getUser(ctx.author.id)["balance"]
@@ -315,7 +315,7 @@ async def ppt(ctx, amount: str = None):
     file = discord.File("images/Duala_dealer.png", filename="Duala_dealer.png")
     await ctx.send(embed=embed, view=view,file=file)
 
-@bot.command()
+@bot.command(help="Crack it open to see its inside")
 async def lootbox(ctx):
 
     userID = ctx.author.id
@@ -329,7 +329,7 @@ async def lootbox(ctx):
     cuantReward = handleLootBox(rarity=rarity, userID=userID)
     return await ctx.send(f"You got a **{rarity}** lootbox, you obtained {cuantReward} bolivares 🐱‍👤")
 
-@bot.command()
+@bot.command(help="First one to type claims this one")
 async def mine(ctx):
     global mio_activo, mio_reclamado
 
@@ -354,4 +354,5 @@ async def mine(ctx):
 
 keep_alive()
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
 
