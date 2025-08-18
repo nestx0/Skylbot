@@ -75,13 +75,13 @@ async def on_message(message):
         return
     
     if peruano == 69:
-        return await message.channel.send("Silencio peruano")
+        return await message.channel.send("Silence peruvian")
 
     if mio_activo == False and peruano == 420:
         mio_activo = True
         mio_reclamado = False
         tiempo_of_las_mio = now
-        await message.channel.send("🎁 ¡Free bolivares! The first one to write *mine obtains the reward. 🎁")
+        await message.channel.send("🎁 ¡Free bolivares! The first one to write /mine obtains the reward. 🎁")
 
     if mio_activo and not mio_reclamado and now - tiempo_of_las_mio > 30:
         mio_activo = False
@@ -354,6 +354,7 @@ async def mine(ctx):
 
 keep_alive()
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
 
 
 
