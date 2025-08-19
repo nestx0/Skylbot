@@ -23,6 +23,7 @@ from shop.rewards import *
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 aiKey = os.getenv('AI_TOKEN')
+ai_lock = asyncio.Lock()
 genai.configure(api_key=aiKey)
 model = genai.GenerativeModel("gemini-2.5-flash")
 prompt_inicial = """
@@ -44,8 +45,6 @@ Ejemplos de estilo:
 - Usuario: "Estoy cansado" → Bot: "Cansado dices… si es mas facil saltarte que rodearte gordo."
 - Usuario: "¿Cómo estás?" → Bot: "Mejor que tu KDA chulo."
 """
-
-chat = model.start_chat(history=[{"role": "user", "parts": [prompt_inicial]}])
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 intents = discord.Intents.default()
@@ -379,16 +378,42 @@ async def mine(ctx):
 
 @bot.command()
 async def ai(ctx, *, mensaje: str):
-    """El usuario habla con Gemini"""
+    """El usuario habla con Gemini (no bloqueante, sesión local para evitar races)"""
+    print("Enter")
     await ctx.trigger_typing()
     try:
-        response = await asyncio.to_thread(chat.send_message, mensaje)
-        await ctx.send(response.text)
+        # Serializamos acceso por si el SDK/objeto no es thread-safe
+        async with ai_lock:
+            # Creamos una sesión local con el prompt inicial (preserva estilo)
+            local_chat = model.start_chat(history=[{"role":"user","parts":[prompt_inicial]}])
+
+            # Llamada bloqueante en hilo, con timeout (20s por ejemplo)
+            try:
+                response = await asyncio.wait_for(
+                    asyncio.to_thread(local_chat.send_message, mensaje),
+                    timeout=20.0
+                )
+            except asyncio.TimeoutError:
+                # Si la IA tarda demasiado, salimos del lock para que otras peticiones no se queden bloqueadas
+                await ctx.send("⏳ La IA tardó demasiado. Intenta de nuevo más tarde.")
+                return
+
+        # Enviamos solo UNA vez la respuesta (fuera del lock)
+        # Si response.text puede ser None o vacío, maneja eso:
+        text = getattr(response, "text", None)
+        if not text:
+            await ctx.send("⚠️ La IA devolvió una respuesta vacía.")
+            return
+
+        await ctx.send(text)
+
     except Exception as e:
+        # Muestra el error en consola para depuración, pero no spamear al usuario
         await ctx.send("⚠️ Error al conectar con Gemini.")
-        print(e)
+        print("AI error:", repr(e))
 
 
 keep_alive()
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
