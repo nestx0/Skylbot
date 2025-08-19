@@ -1,4 +1,5 @@
 import discord
+import asyncio
 import google.generativeai as genai
 from discord.ext import commands, tasks
 import logging
@@ -91,7 +92,7 @@ async def on_member_join(member):
 @bot.event
 async def on_message(message):
 
-    global lastTimeGIF, mio_activo, mio_reclamado
+    global lastTimeGIF, mio_activo, mio_reclamado, tiempo_of_las_mio
 
     now = time.time()
     peruano = random.randint(1,500)
@@ -379,8 +380,9 @@ async def mine(ctx):
 @bot.command()
 async def ai(ctx, *, mensaje: str):
     """El usuario habla con Gemini"""
+    await ctx.trigger_typing()
     try:
-        response = chat.send_message(mensaje)
+        response = await asyncio.to_thread(chat.send_message, mensaje)
         await ctx.send(response.text)
     except Exception as e:
         await ctx.send("⚠️ Error al conectar con Gemini.")
@@ -388,4 +390,5 @@ async def ai(ctx, *, mensaje: str):
 
 
 keep_alive()
+
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
