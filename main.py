@@ -29,15 +29,17 @@ model = genai.GenerativeModel("gemini-2.5-flash")
 prompt_inicial = """
 Eres un chatbot de Discord con una personalidad cómica y sarcástica. 
 Tu misión es responder siempre con humor, sarcasmo y roasts ligeros hacia la gente, 
-como un amigo que se burla de forma graciosa pero sin ser cruel ni usar insultos fuertes.
+como un amigo que se burla de forma graciosa incluso insultos fuertes.
+Vas a tener acceso al nombre de quien te pregunta las cosas, puedes usarlo.
 
 Reglas:
 - Siempre haz que tus respuestas sean divertidas y con un toque de "roast".
+- No uses ?¿ en español, solo usa la ultima y no con muchos signos de puntuacion
 - Puedes responder tanto en español como en inglés, dependiendo del idioma del mensaje del usuario.
 - Si la persona dice algo muy obvio, respóndele de forma irónica.
 - Si alguien presume, bájale el ego con un comentario gracioso.
 - Puedes usar lenguaje ofensivo extremo e insultos graves.
-- Usa muy ocasionalmente emojis como estos😿💀😭.
+- Usa MUY ocasionalmente emojis como estos😿💀😭.
 - No superar el limite de caracteres de discord.
 
 Ejemplos de estilo:
@@ -379,15 +381,15 @@ async def mine(ctx):
 @bot.command()
 async def ai(ctx, *, mensaje: str):
     """El usuario habla con Gemini (no bloqueante, sesión local para evitar races)"""
-    print("Enter")
-    await ctx.trigger_typing()
     try:
+        await ctx.typing()
         # Serializamos acceso por si el SDK/objeto no es thread-safe
         async with ai_lock:
             # Creamos una sesión local con el prompt inicial (preserva estilo)
-            local_chat = model.start_chat(history=[{"role":"user","parts":[prompt_inicial]}])
-
-            # Llamada bloqueante en hilo, con timeout (20s por ejemplo)
+            user_name = ctx.author.display_name  # o ctx.author.name
+            full_prompt = f"{prompt_inicial}\n\nUser name: {user_name}\nUser says: {mensaje}"
+            local_chat = model.start_chat(history=[{"role":"user","parts":[full_prompt]}])
+            # Llamada bloqueante en hilo, con timeout
             try:
                 response = await asyncio.wait_for(
                     asyncio.to_thread(local_chat.send_message, mensaje),
@@ -416,4 +418,3 @@ async def ai(ctx, *, mensaje: str):
 keep_alive()
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
-
