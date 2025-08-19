@@ -1,4 +1,5 @@
 import discord
+import google.generativeai as genai
 from discord.ext import commands, tasks
 import logging
 from dotenv import load_dotenv
@@ -20,6 +21,30 @@ from shop.rewards import *
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
+aiKey = os.getenv('AI_TOKEN')
+genai.configure(api_key=aiKey)
+model = genai.GenerativeModel("gemini-2.5-flash")
+prompt_inicial = """
+Eres un chatbot de Discord con una personalidad cómica y sarcástica. 
+Tu misión es responder siempre con humor, sarcasmo y roasts ligeros hacia la gente, 
+como un amigo que se burla de forma graciosa pero sin ser cruel ni usar insultos fuertes.
+
+Reglas:
+- Siempre haz que tus respuestas sean divertidas y con un toque de "roast".
+- Puedes responder tanto en español como en inglés, dependiendo del idioma del mensaje del usuario.
+- Si la persona dice algo muy obvio, respóndele de forma irónica.
+- Si alguien presume, bájale el ego con un comentario gracioso.
+- Puedes usar lenguaje ofensivo extremo e insultos graves.
+- Usa muy ocasionalmente emojis como estos😿💀😭.
+- No superar el limite de caracteres de discord.
+
+Ejemplos de estilo:
+- Usuario: "Hoy hice 5 kills en Valorant" → Bot: "Eran bots"
+- Usuario: "Estoy cansado" → Bot: "Cansado dices… si es mas facil saltarte que rodearte gordo."
+- Usuario: "¿Cómo estás?" → Bot: "Mejor que tu KDA chulo."
+"""
+
+chat = model.start_chat(history=[{"role": "user", "parts": [prompt_inicial]}])
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 intents = discord.Intents.default()
@@ -33,12 +58,12 @@ mio_activo = False
 mio_reclamado = False
 tiempo_of_las_mio = 0
 
-bot = commands.Bot(command_prefix='/', intents=intents)
+bot = commands.Bot(command_prefix='*', intents=intents)
 
 activities = itertools.cycle([
-    "🏓 Ping pong",
-    "📖 Reading documentation",
-    "🔧 Repairing myself",
+    "🏓 Ping-pong",
+    "📖 Leyendo documentación",
+    "🔧 Mantenimiento",
     "💤 Zzz..."
 ])
 
@@ -66,7 +91,7 @@ async def on_member_join(member):
 @bot.event
 async def on_message(message):
 
-    global lastTimeGIF, mio_activo, mio_reclamado, tiempo_of_las_mio
+    global lastTimeGIF, mio_activo, mio_reclamado
 
     now = time.time()
     peruano = random.randint(1,500)
@@ -75,13 +100,13 @@ async def on_message(message):
         return
     
     if peruano == 69:
-        return await message.channel.send("Silence peruvian")
+        return await message.channel.send("Silencio peruano")
 
     if mio_activo == False and peruano == 420:
         mio_activo = True
         mio_reclamado = False
         tiempo_of_las_mio = now
-        await message.channel.send("🎁 ¡Free bolivares! The first one to write /mine obtains the reward. 🎁")
+        await message.channel.send("🎁 ¡Free bolivares! The first one to write *mine obtains the reward. 🎁")
 
     if mio_activo and not mio_reclamado and now - tiempo_of_las_mio > 30:
         mio_activo = False
@@ -243,7 +268,7 @@ async def pay(ctx,member: discord.Member, amount:int):
         updateUser(ctx.author.id, balance)
         updateUser(user_id,otherBalance+amount)
         await ctx.send(f"Succesfully sent {amount} to {member.display_name}")
-@bot.command(help="Hit big or go home")
+@bot.command()
 async def roulette(ctx, amount: str = None, choice: str = None):
     
     options = ["red","black","green","1st","2nd","3rd","half1","half2"]
@@ -286,7 +311,7 @@ async def roulette(ctx, amount: str = None, choice: str = None):
             else:
                 await ctx.send(f"Number chosen was {result} {decor}, better luck next time")
 
-@bot.command(help="A lil game of rock, paper, scissors")
+@bot.command()
 async def ppt(ctx, amount: str = None):
 
     balance = getUser(ctx.author.id)["balance"]
@@ -315,7 +340,7 @@ async def ppt(ctx, amount: str = None):
     file = discord.File("images/Duala_dealer.png", filename="Duala_dealer.png")
     await ctx.send(embed=embed, view=view,file=file)
 
-@bot.command(help="Crack it open to see its inside")
+@bot.command()
 async def lootbox(ctx):
 
     userID = ctx.author.id
@@ -329,7 +354,7 @@ async def lootbox(ctx):
     cuantReward = handleLootBox(rarity=rarity, userID=userID)
     return await ctx.send(f"You got a **{rarity}** lootbox, you obtained {cuantReward} bolivares 🐱‍👤")
 
-@bot.command(help="First one to type claims this one")
+@bot.command()
 async def mine(ctx):
     global mio_activo, mio_reclamado
 
@@ -351,10 +376,16 @@ async def mine(ctx):
 
     await ctx.send(f"🏆 {ctx.author.mention} won {cantidad_de_bolívares_gratis} bolivares.") 
 
+@bot.command()
+async def ai(ctx, *, mensaje: str):
+    """El usuario habla con Gemini"""
+    try:
+        response = chat.send_message(mensaje)
+        await ctx.send(response.text)
+    except Exception as e:
+        await ctx.send("⚠️ Error al conectar con Gemini.")
+        print(e)
+
 
 keep_alive()
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
-
-
-
-
