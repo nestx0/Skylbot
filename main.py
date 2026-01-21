@@ -68,10 +68,10 @@ tiempo_of_las_mio = 0
 bot = commands.Bot(command_prefix='*', intents=intents)
 
 activities = itertools.cycle([
-    "🏓 Ping-pong",
-    "📖 Leyendo documentación",
-    "🔧 Mantenimiento",
-    "💤 Zzz..."
+    "🏓 Playing Ping-pong",
+    "📖 Reading Documentation",
+    "🔧 Repairing",
+    "💤 Sleeping"
 ])
 
 @bot.event
@@ -105,6 +105,9 @@ async def on_message(message):
 
     if message.author == bot.user:
         return
+        #    if client.user.mentioned_in(message):
+        
+        #ai()
     
     if peruano == 69:
         return await message.channel.send("Silencio peruano")
@@ -242,9 +245,9 @@ async def leaderboard(ctx):
 
     for i,entry in enumerate(leaderboard, start=1):
         member = ctx.guild.get_member(entry['user_id'])
-        name = member.display_name
-
-        entries.append(f"{i}. **{name}** - {entry['balance']} bolivares")
+        if member:
+            name = member.display_name
+            entries.append(f"{i}. **{name}** - {entry['balance']} bolivares")
     msg = "\n".join(entries)
 
     embed = discord.Embed(
@@ -276,7 +279,7 @@ async def pay(ctx,member: discord.Member, amount:int):
         updateUser(user_id,otherBalance+amount)
         await ctx.send(f"Succesfully sent {amount} to {member.display_name}")
 @bot.command()
-async def roulette(ctx, amount: str = None, choice: str = None):
+async def roulette(ctx, amount = None, choice = None):
     
     options = ["red","black","green","1st","2nd","3rd","half1","half2"]
     balance = getUser(ctx.author.id)["balance"]
@@ -319,22 +322,22 @@ async def roulette(ctx, amount: str = None, choice: str = None):
                 await ctx.send(f"Number chosen was {result} {decor}, better luck next time")
 
 @bot.command()
-async def ppt(ctx, amount: str = None):
+async def ppt(ctx, amount: str):
 
     balance = getUser(ctx.author.id)["balance"]
-
+    balance = str(balance) 
     if isinstance(amount, str) and amount.lower() == "allin":
         amount = balance
     else:
         try:
-            amount = int(amount)
-            if amount < 1:
+            bet_amount = int(amount)
+            if bet_amount < 1:
                 return await ctx.send("❌ You must bet at least 1 point.")
         except ValueError:
             return await ctx.send("❌ You must enter a number or 'allin'.")
-    if amount > balance:
+    if bet_amount > int(balance):
         return await ctx.send("❌ Not enough balance.")
-    newBalance = balance - amount
+    newBalance = int(balance) - bet_amount
     updateUser(ctx.author.id, newBalance)
 
     embed = discord.Embed(
@@ -342,7 +345,7 @@ async def ppt(ctx, amount: str = None):
         description="Click to start🤯",
         color=discord.Color.blue()
     )
-    view = PPTView(ctx.author.id, amount)
+    view = PPTView(ctx.author.id, bet_amount)
     embed.set_thumbnail(url="attachment://Duala_dealer.png")
     file = discord.File("images/Duala_dealer.png", filename="Duala_dealer.png")
     await ctx.send(embed=embed, view=view,file=file)
