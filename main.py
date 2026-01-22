@@ -1,28 +1,29 @@
-import discord
 import asyncio
+import itertools
+import logging
+import os
+import random
+import sqlite3
+import time
+
+import discord
 import google.generativeai as genai
 from discord.ext import commands, tasks
-import logging
 from dotenv import load_dotenv
-import os
-import time
-import itertools
 from jokeapi import Jokes
+
 from blackjack.game import BlackjackGame
 from blackjack.views import BlackjackView
-import sqlite3
-import random
 from dataBase import *
-from roulette.roulette import getWin, getMultiplier
 from ppt.ppt_game import PPTGame
 from ppt.ppt_view import PPTView
-from keep_alive import keep_alive
+from roulette.roulette import *
 from shop.lootbox import *
 from shop.rewards import *
 
 load_dotenv()
-token = os.getenv('DISCORD_TOKEN')
-aiKey = os.getenv('AI_TOKEN')
+token = os.getenv("DISCORD_TOKEN")
+aiKey = os.getenv("AI_TOKEN")
 ai_lock = asyncio.Lock()
 genai.configure(api_key=aiKey)
 model = genai.GenerativeModel("gemini-2.5-flash")
@@ -53,7 +54,7 @@ Ejemplos de estilo:
 - Usuario: "¿Cómo estás?" → Bot: "Mejor que tu KDA chulo."
 """
 
-handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
 intents = discord.Intents.default()
 
 intents.message_content = True
@@ -65,24 +66,24 @@ mio_activo = False
 mio_reclamado = False
 tiempo_of_las_mio = 0
 
-bot = commands.Bot(command_prefix='*', intents=intents)
+bot = commands.Bot(command_prefix="*", intents=intents)
 
-activities = itertools.cycle([
-    "🏓 Playing Ping-pong",
-    "📖 Reading Documentation",
-    "🔧 Repairing",
-    "💤 Sleeping"
-])
+activities = itertools.cycle(
+    ["🏓 Playing Ping-pong", "📖 Reading Documentation", "🔧 Repairing", "💤 Sleeping"]
+)
+
 
 @bot.event
 async def on_ready():
     change_activity.start()
     print(f"We are ready to go, {bot.user.name}")
 
+
 @tasks.loop(seconds=240)
 async def change_activity():
     next_status = next(activities)
     await bot.change_presence(activity=discord.Game(next_status))
+
 
 @bot.event
 async def on_member_join(member):
@@ -95,20 +96,21 @@ async def on_member_join(member):
     else:
         print("Channel not found")
 
+
 @bot.event
 async def on_message(message):
 
     global lastTimeGIF, mio_activo, mio_reclamado, tiempo_of_las_mio
 
     now = time.time()
-    peruano = random.randint(1,500)
+    peruano = random.randint(1, 500)
 
     if message.author == bot.user:
         return
         #    if client.user.mentioned_in(message):
-        
-        #ai()
-    
+
+        # ai()
+
     if peruano == 69:
         return await message.channel.send("Silencio peruano")
 
@@ -116,7 +118,9 @@ async def on_message(message):
         mio_activo = True
         mio_reclamado = False
         tiempo_of_las_mio = now
-        await message.channel.send("🎁 ¡Free bolivares! The first one to write *mine obtains the reward. 🎁")
+        await message.channel.send(
+            "🎁 ¡Free bolivares! The first one to write *mine obtains the reward. 🎁"
+        )
 
     if mio_activo and not mio_reclamado and now - tiempo_of_las_mio > 30:
         mio_activo = False
@@ -133,9 +137,11 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+
 @bot.command(help="pong")
 async def ping(ctx):
     await ctx.send("**pong**")
+
 
 @bot.command(help="Quick question about anything")
 async def poll(ctx, *, msg):
@@ -157,6 +163,7 @@ async def poll(ctx, *, msg):
     else:
         print("Emojis not found")
 
+
 @bot.command(help="Random joke, go!")
 async def joke(ctx):
     j = await Jokes()
@@ -168,12 +175,13 @@ async def joke(ctx):
         msg = joke["joke"]
     else:
         msg = joke["setup"]
-        msg += '\n'
+        msg += "\n"
         msg += f"||{joke['delivery']}||"
     await ctx.send(msg)
 
+
 @bot.command(help="Play a classic Blackjack hand using points as bets")
-async def blackjack(ctx,bet):
+async def blackjack(ctx, bet):
 
     balance = int(getUser(ctx.author.id)["balance"])
     file = discord.File("images/Duala_dealer.png", filename="Duala_dealer.png")
@@ -190,26 +198,28 @@ async def blackjack(ctx,bet):
     if bet > balance:
         return await ctx.send("❌ Not enough balance.")
 
-    updateUser(ctx.author.id,balance - bet)
-    
-    game = BlackjackGame(ctx.author,bet)
+    updateUser(ctx.author.id, balance - bet)
+
+    game = BlackjackGame(ctx.author, bet)
     view = BlackjackView(game)
     await ctx.send(embed=game.generarEmbed(), view=view, file=file)
 
     balance += bet
 
+
 @bot.command(help="Get some points to bet on Blackjack")
-@commands.cooldown(1,60, commands.BucketType.user)
+@commands.cooldown(1, 60, commands.BucketType.user)
 async def work(ctx):
     userID = ctx.author.id
     userBalance = getUser(userID)
 
-    reward = random.randint(350,500)
+    reward = random.randint(350, 500)
     newBalance = userBalance["balance"] + reward
-    
-    updateUser(userID,newBalance)
+
+    updateUser(userID, newBalance)
 
     await ctx.send(f"You've earned {reward}, your balance is {newBalance}")
+
 
 @bot.command(help="Check your current balance")
 async def balance(ctx):
@@ -221,51 +231,51 @@ async def balance(ctx):
 
     await ctx.send(f"Your current balance is {balance}{mensaje}")
 
+
 @bot.command(help="Kinda self-explanatory")
 async def guide(ctx):
 
-    lines=[]
+    lines = []
     for cmd in bot.commands:
         signature = f"{cmd.signature}" if cmd.signature else ""
         description = cmd.help or "No description yet"
         lines.append(f"• **{cmd.name} {signature}** -   {description}")
-    listado =  "\n".join(lines)
+    listado = "\n".join(lines)
 
     embed = discord.Embed(
-        title="Commands",
-        description=listado,
-        color=discord.Color.green()
+        title="Commands", description=listado, color=discord.Color.green()
     )
 
     await ctx.send(embed=embed)
+
 
 @bot.command(help="Get the top 10 members with the most points")
 async def leaderboard(ctx):
     entries = []
     leaderboard = getLeaderboard()
 
-    for i,entry in enumerate(leaderboard, start=1):
-        member = ctx.guild.get_member(entry['user_id'])
+    for i, entry in enumerate(leaderboard, start=1):
+        member = ctx.guild.get_member(entry["user_id"])
         if member:
             name = member.display_name
             entries.append(f"{i}. **{name}** - {entry['balance']} bolivares")
     msg = "\n".join(entries)
 
     embed = discord.Embed(
-        title="Leaderboard",
-        description=msg,
-        color=discord.Color.green()
+        title="Leaderboard", description=msg, color=discord.Color.green()
     )
 
     await ctx.send(embed=embed)
 
+
 @bot.command(help="Too good to be true")
-async def jackblack(ctx,*,msg):
+async def jackblack(ctx, *, msg):
     await ctx.send(file=discord.File("images/jack-black-minecraft.gif"))
 
+
 @bot.command(help="Pay an amount to another member")
-async def pay(ctx,member: discord.Member, amount:int):
-    user_id=member.id
+async def pay(ctx, member: discord.Member, amount: int):
+    user_id = member.id
     balance = getUser(ctx.author.id)["balance"]
 
     if user_id == ctx.author.id or amount < 1:
@@ -278,16 +288,30 @@ async def pay(ctx,member: discord.Member, amount:int):
         balance -= amount
         otherBalance = getUser(user_id)["balance"]
         updateUser(ctx.author.id, balance)
-        updateUser(user_id,otherBalance+amount)
+        updateUser(user_id, otherBalance + amount)
         await ctx.send(f"Succesfully sent {amount} to {member.display_name}")
 
-@bot.command()
-async def roulette(ctx, amount = None, choice = None, numbers: str = None):
-    
-    options = ["red","black","green","1st","2nd","3rd","half1","half2","numeros","huerfanos","gran serie","serie 5/8","zona cero"]
-    balance = getUser(ctx.author.id)["balance"]
-    numbas = {"0" : "green","1": "red","2": "black","3": "red","4": "black","5": "red","6": "black","7": "red","8": "black","9": "red","10": "black","11": "black","12": "red","13": "black","14": "red","15": "black","16": "red","17": "black","18": "red","19": "red","20": "black","21": "red","22": "black","23": "red","24": "black","25": "red","26": "black","27": "red","28": "black","29": "black","30": "red","31": "black","32": "red","33": "black","34": "red","35": "black","36": "red"}
 
+@bot.command()
+async def roulette(ctx, amount=None, choice=None, numbers: str | None = None):
+
+    options = [
+        "red",
+        "black",
+        "green",
+        "1st",
+        "2nd",
+        "3rd",
+        "half1",
+        "half2",
+        "numeros",
+        "huerfanos",
+        "gran serie",
+        "serie 5/8",
+        "zona cero",
+    ]
+    balance = getUser(ctx.author.id)["balance"]
+    numbas = getNumbers()
     if isinstance(amount, str) and amount.lower() == "allin":
         amount = balance
     else:
@@ -302,16 +326,17 @@ async def roulette(ctx, amount = None, choice = None, numbers: str = None):
 
     if amount and choice:
         if choice.lower() not in options:
-            await ctx.send("Select a valid option (*red*, *black*, *green*, '\n'*1st*, *2nd*, *3rd*, '\n'*half1*, *half2*, '\n'*huerfanos*, *gran serie*, *serie 5/8*, *zona cero*, '\n'*numeros*)")
+            await ctx.send(
+                "Select a valid option (*red*, *black*, *green*, '\n'*1st*, *2nd*, *3rd*, '\n'*half1*, *half2*, '\n'*huerfanos*, *gran serie*, *serie 5/8*, *zona cero*, '\n'*numeros*)"
+            )
             return
         elif choice != "numeros":
-            result = random.randint(0,36)
-            updateUser(ctx.author.id,balance - amount)
+            result = random.randint(0, 36)
+            updateUser(ctx.author.id, balance - amount)
             newBalance = getUser(ctx.author.id)["balance"]
 
             win = getWin(result, choice)
             mult = getMultiplier(win, choice)
-            
             amount *= mult
             updateUser(ctx.author.id, newBalance + amount)
             if "red" in numbas[str(result)]:
@@ -321,21 +346,33 @@ async def roulette(ctx, amount = None, choice = None, numbers: str = None):
             else:
                 decor = "🟢"
             if win:
-                await ctx.send(f"Number chosen was {result} {decor}, you won {amount} bolivares")
+                await ctx.send(
+                    f"Number chosen was {result} {decor}, you won {amount} bolivares"
+                )
             else:
-                await ctx.send(f"Number chosen was {result} {decor}, better luck next time")
+                await ctx.send(
+                    f"Number chosen was {result} {decor}, better luck next time"
+                )
         else:
             if not numbers:
-                return await ctx.send("You must provide numbers to bet on when choosing 'numeros'")
+                return await ctx.send(
+                    "You must provide numbers to bet on when choosing 'numeros'"
+                )
             try:
-                chosen_numbers = [int(num) for num in numbers.split(" ") if 0 <= int(num) <= 36]
+                chosen_numbers = [
+                    int(num) for num in numbers.split(" ") if 0 <= int(num) <= 36
+                ]
                 if not chosen_numbers:
-                    return await ctx.send("You must provide valid numbers between 0 and 36")
+                    return await ctx.send(
+                        "You must provide valid numbers between 0 and 36"
+                    )
             except ValueError:
-                return await ctx.send("Please provide numbers only, separated by spaces")
+                return await ctx.send(
+                    "Please provide numbers only, separated by spaces"
+                )
 
-            result = random.randint(0,36)
-            updateUser(ctx.author.id,balance - amount)
+            result = random.randint(0, 36)
+            updateUser(ctx.author.id, balance - amount)
             newBalance = getUser(ctx.author.id)["balance"]
             if "red" in numbas[str(result)]:
                 decor = "🔴"
@@ -343,20 +380,25 @@ async def roulette(ctx, amount = None, choice = None, numbers: str = None):
                 decor = "⚫"
             else:
                 decor = "🟢"
-            
+
             if result in chosen_numbers:
                 mult = 36 / len(chosen_numbers)
                 amount *= mult
                 updateUser(ctx.author.id, newBalance + amount)
-                await ctx.send(f"Number chosen was {result}{decor}, you won {amount} bolivares")
+                await ctx.send(
+                    f"Number chosen was {result}{decor}, you won {amount} bolivares"
+                )
             else:
-                await ctx.send(f"Number chosen was {result}{decor}, better luck next time")
+                await ctx.send(
+                    f"Number chosen was {result}{decor}, better luck next time"
+                )
+
 
 @bot.command()
 async def ppt(ctx, amount: str):
 
     balance = getUser(ctx.author.id)["balance"]
-    balance = str(balance) 
+    balance = str(balance)
     if isinstance(amount, str) and amount.lower() == "allin":
         amount = balance
     else:
@@ -374,26 +416,30 @@ async def ppt(ctx, amount: str):
     embed = discord.Embed(
         title="Rock, Paper, Scissors",
         description="Click to start🤯",
-        color=discord.Color.blue()
+        color=discord.Color.blue(),
     )
     view = PPTView(ctx.author.id, bet_amount)
     embed.set_thumbnail(url="attachment://Duala_dealer.png")
     file = discord.File("images/Duala_dealer.png", filename="Duala_dealer.png")
-    await ctx.send(embed=embed, view=view,file=file)
+    await ctx.send(embed=embed, view=view, file=file)
+
 
 @bot.command()
 async def lootbox(ctx):
 
     userID = ctx.author.id
     balance = getUser(userID)["balance"]
-    if balance < 10500:
-        return await ctx.send("Lootboxes cost 10.500 bolivares, try again later❌")
+    if balance < 10000:
+        return await ctx.send("Lootboxes cost 10.000 bolivares, try again later❌")
     else:
-        newBalance = balance - 10500
+        newBalance = balance - 10000
         updateUser(userID, newBalance)
     rarity = openLootBox()
     cuantReward = handleLootBox(rarity=rarity, userID=userID)
-    return await ctx.send(f"You got a **{rarity}** lootbox, you obtained {cuantReward} bolivares 🐱‍👤")
+    return await ctx.send(
+        f"You got a **{rarity}** lootbox, you obtained {cuantReward} bolivares 🐱‍👤"
+    )
+
 
 @bot.command()
 async def mine(ctx):
@@ -415,7 +461,36 @@ async def mine(ctx):
     mio_reclamado = True
     mio_activo = False
 
-    await ctx.send(f"🏆 {ctx.author.mention} won {cantidad_de_bolívares_gratis} bolivares.") 
+    await ctx.send(
+        f"🏆 {ctx.author.mention} won {cantidad_de_bolívares_gratis} bolivares."
+    )
+
+
+@bot.command()
+async def buyRole(ctx):
+    grupo = ctx.guild
+    userID = ctx.author.id
+    miembro = grupo.get_member(userID)
+
+    roleID = 1463967996186726481
+    rol = grupo.get_role(roleID)
+
+    if rol is None:
+        print("No role found")
+    if miembro is None:
+        print("Member not found")
+
+    balance = getUser(userID)["balance"]
+
+    if balance < 200_000:
+        await ctx.send(
+            "In order to buy this secret role, you gotta have 200.000 bolivares"
+        )
+    else:
+        await ctx.send("Purchasing secret role...")
+        await miembro.add_role(rol)
+        print("Success with assinging role")
+
 
 @bot.command()
 async def ai(ctx, *, mensaje: str):
@@ -426,13 +501,16 @@ async def ai(ctx, *, mensaje: str):
         async with ai_lock:
             # Creamos una sesión local con el prompt inicial (preserva estilo)
             user_name = ctx.author.display_name  # o ctx.author.name
-            full_prompt = f"{prompt_inicial}\n\nUser name: {user_name}\nUser says: {mensaje}"
-            local_chat = model.start_chat(history=[{"role":"user","parts":[full_prompt]}])
+            full_prompt = (
+                f"{prompt_inicial}\n\nUser name: {user_name}\nUser says: {mensaje}"
+            )
+            local_chat = model.start_chat(
+                history=[{"role": "user", "parts": [full_prompt]}]
+            )
             # Llamada bloqueante en hilo, con timeout
             try:
                 response = await asyncio.wait_for(
-                    asyncio.to_thread(local_chat.send_message, mensaje),
-                    timeout=20.0
+                    asyncio.to_thread(local_chat.send_message, mensaje), timeout=20.0
                 )
             except asyncio.TimeoutError:
                 # Si la IA tarda demasiado, salimos del lock para que otras peticiones no se queden bloqueadas
@@ -454,12 +532,5 @@ async def ai(ctx, *, mensaje: str):
         print("AI error:", repr(e))
 
 
-keep_alive()
-
-bot.run(token, log_handler=handler, log_level=logging.DEBUG)
-
-
-
-
-
-
+if token is not None:
+    bot.run(token, log_handler=handler, log_level=logging.DEBUG)
