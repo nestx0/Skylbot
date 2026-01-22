@@ -156,6 +156,7 @@ async def poll(ctx, *, msg):
         await poll_msg.add_reaction(customEmoji2)
     else:
         print("Emojis not found")
+
 @bot.command(help="Random joke, go!")
 async def joke(ctx):
     j = await Jokes()
@@ -257,6 +258,7 @@ async def leaderboard(ctx):
     )
 
     await ctx.send(embed=embed)
+
 @bot.command(help="Too good to be true")
 async def jackblack(ctx,*,msg):
     await ctx.send(file=discord.File("images/jack-black-minecraft.gif"))
@@ -278,11 +280,13 @@ async def pay(ctx,member: discord.Member, amount:int):
         updateUser(ctx.author.id, balance)
         updateUser(user_id,otherBalance+amount)
         await ctx.send(f"Succesfully sent {amount} to {member.display_name}")
+
 @bot.command()
-async def roulette(ctx, amount = None, choice = None):
+async def roulette(ctx, amount = None, choice = None, numbers: str = None):
     
-    options = ["red","black","green","1st","2nd","3rd","half1","half2"]
+    options = ["red","black","green","1st","2nd","3rd","half1","half2","numeros","huerfanos","gran serie","serie 5/8","zona cero"]
     balance = getUser(ctx.author.id)["balance"]
+    numbas = {"0" : "green","1": "red","2": "black","3": "red","4": "black","5": "red","6": "black","7": "red","8": "black","9": "red","10": "black","11": "black","12": "red","13": "black","14": "red","15": "black","16": "red","17": "black","18": "red","19": "red","20": "black","21": "red","22": "black","23": "red","24": "black","25": "red","26": "black","27": "red","28": "black","29": "black","30": "red","31": "black","32": "red","33": "black","34": "red","35": "black","36": "red"}
 
     if isinstance(amount, str) and amount.lower() == "allin":
         amount = balance
@@ -298,9 +302,9 @@ async def roulette(ctx, amount = None, choice = None):
 
     if amount and choice:
         if choice.lower() not in options:
-            await ctx.send("Select a valid option (*red*, *black*, *green*, *1st*, *2nd*, *3rd*, *half1*, *half2*)")
+            await ctx.send("Select a valid option (*red*, *black*, *green*, '\n'*1st*, *2nd*, *3rd*, '\n'*half1*, *half2*, '\n'*huerfanos*, *gran serie*, *serie 5/8*, *zona cero*, '\n'*numeros*)")
             return
-        else:
+        elif choice != "numeros":
             result = random.randint(0,36)
             updateUser(ctx.author.id,balance - amount)
             newBalance = getUser(ctx.author.id)["balance"]
@@ -310,9 +314,9 @@ async def roulette(ctx, amount = None, choice = None):
             
             amount *= mult
             updateUser(ctx.author.id, newBalance + amount)
-            if result % 2 != 0:
+            if "red" in numbas[str(result)]:
                 decor = "🔴"
-            elif result != 0:
+            elif "black" in numbas[str(result)]:
                 decor = "⚫"
             else:
                 decor = "🟢"
@@ -320,6 +324,33 @@ async def roulette(ctx, amount = None, choice = None):
                 await ctx.send(f"Number chosen was {result} {decor}, you won {amount} bolivares")
             else:
                 await ctx.send(f"Number chosen was {result} {decor}, better luck next time")
+        else:
+            if not numbers:
+                return await ctx.send("You must provide numbers to bet on when choosing 'numeros'")
+            try:
+                chosen_numbers = [int(num) for num in numbers.split(" ") if 0 <= int(num) <= 36]
+                if not chosen_numbers:
+                    return await ctx.send("You must provide valid numbers between 0 and 36")
+            except ValueError:
+                return await ctx.send("Please provide numbers only, separated by spaces")
+
+            result = random.randint(0,36)
+            updateUser(ctx.author.id,balance - amount)
+            newBalance = getUser(ctx.author.id)["balance"]
+            if "red" in numbas[str(result)]:
+                decor = "🔴"
+            elif "black" in numbas[str(result)]:
+                decor = "⚫"
+            else:
+                decor = "🟢"
+            
+            if result in chosen_numbers:
+                mult = 36 / len(chosen_numbers)
+                amount *= mult
+                updateUser(ctx.author.id, newBalance + amount)
+                await ctx.send(f"Number chosen was {result}{decor}, you won {amount} bolivares")
+            else:
+                await ctx.send(f"Number chosen was {result}{decor}, better luck next time")
 
 @bot.command()
 async def ppt(ctx, amount: str):
