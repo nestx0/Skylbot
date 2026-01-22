@@ -304,11 +304,11 @@ async def roulette(ctx, amount=None, choice=None, numbers: str | None = None):
         "3rd",
         "half1",
         "half2",
-        "numeros",
-        "huerfanos",
-        "gran serie",
-        "serie 5/8",
-        "zona cero",
+        "numbers",
+        "orphans",
+        "gserie",
+        "5/8",
+        "zerozone",
     ]
     balance = getUser(ctx.author.id)["balance"]
     numbas = getNumbers()
@@ -327,7 +327,7 @@ async def roulette(ctx, amount=None, choice=None, numbers: str | None = None):
     if amount and choice:
         if choice.lower() not in options:
             await ctx.send(
-                "Select a valid option (*red*, *black*, *green*, '\n'*1st*, *2nd*, *3rd*, '\n'*half1*, *half2*, '\n'*huerfanos*, *gran serie*, *serie 5/8*, *zona cero*, '\n'*numeros*)"
+                "Select a valid option: \n *red*, *black*, *green*, \n *1st*, *2nd*, *3rd*, \n *half1*, *half2*, \n *orphans*, *gserie*, *5/8*, *zerozone*, \n *numbers*"
             )
             return
         elif choice != "numeros":
@@ -396,7 +396,7 @@ async def roulette(ctx, amount=None, choice=None, numbers: str | None = None):
 
 @bot.command()
 async def ppt(ctx, amount: str):
-
+    bet_amount = 0
     balance = getUser(ctx.author.id)["balance"]
     balance = str(balance)
     if isinstance(amount, str) and amount.lower() == "allin":

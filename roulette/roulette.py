@@ -58,7 +58,7 @@ def getWin(result: int, choice: str, numbers: list | None = None):
             return 1 <= result <= 18
         case "half2":
             return 19 <= result <= 36
-        case "gran serie":
+        case "gserie":
             return result in [
                 0,
                 3,
@@ -77,11 +77,11 @@ def getWin(result: int, choice: str, numbers: list | None = None):
                 32,
                 35,
             ]
-        case "serie 5/8":
+        case "5/8":
             return result in [5, 8, 10, 11, 13, 16, 23, 24, 27, 30, 33, 36]
-        case "zona cero":
+        case "zerozone":
             return result in [0, 3, 12, 15, 26, 32, 35]
-        case "huerfanos":
+        case "orphans":
             return result in [1, 6, 9, 14, 17, 20, 31, 34]
         case "numbers":
             if numbers is not None:
