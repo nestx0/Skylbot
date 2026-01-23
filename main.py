@@ -304,7 +304,7 @@ async def pay(ctx, member: discord.Member, amount: int):
 
 
 @bot.command()
-async def roulette(ctx, amount=None, choice=None, numbers: str | None = None):
+async def roulette(ctx, amount=None, choice=None, *,numbers: str | None = None):
 
     options = [
         "red",
@@ -347,6 +347,7 @@ async def roulette(ctx, amount=None, choice=None, numbers: str | None = None):
             newBalance = getUser(ctx.author.id)["balance"]
 
             win = getWin(result, choice)
+
             mult = getMultiplier(win, choice)
             amount = int(amount * mult)
             updateUser(ctx.author.id, newBalance + amount)
@@ -394,7 +395,7 @@ async def roulette(ctx, amount=None, choice=None, numbers: str | None = None):
 
             if result in chosen_numbers:
                 mult = 36 / len(chosen_numbers)
-                amount *= mult
+                amount = round(amount * mult)
                 updateUser(ctx.author.id, newBalance + amount)
                 await ctx.send(
                     f"Number chosen was {result}{decor}, you won {amount} bolivares"
@@ -408,10 +409,10 @@ async def roulette(ctx, amount=None, choice=None, numbers: str | None = None):
 @bot.command()
 async def ppt(ctx, amount: str):
     bet_amount = 0
-    balance = getUser(ctx.author.id)["balance"]
+    balance = getUser(ctx.author.id)["balance"] 
     balance = str(balance)
     if isinstance(amount, str) and amount.lower() == "allin":
-        amount = balance
+        bet_amount = int(balance)
     else:
         try:
             bet_amount = int(amount)
