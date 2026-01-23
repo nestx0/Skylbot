@@ -102,13 +102,13 @@ def getMultiplier(win: bool, choice: str, numbers: list | None = None):
             case "numbers":
                 if numbers is not None:
                     return 36 / len(numbers)
-            case "gran serie":
+            case "gserie":
                 return 36 / 16
-            case "serie 5/8":
+            case "5/8":
                 return 36 / 12
-            case "zona cero":
+            case "zerozone":
                 return 36 / 7
-            case "huerfanos":
+            case "orphans":
                 return 36 / 8
     else:
         return 0

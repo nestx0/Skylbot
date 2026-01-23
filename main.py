@@ -10,6 +10,8 @@ import discord
 import google.generativeai as genai
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from jokeapi import Jokes
 
 from blackjack.game import BlackjackGame
@@ -20,6 +22,15 @@ from ppt.ppt_view import PPTView
 from roulette.roulette import *
 from shop.lootbox import *
 from shop.rewards import *
+
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
@@ -330,14 +341,14 @@ async def roulette(ctx, amount=None, choice=None, numbers: str | None = None):
                 "Select a valid option: \n *red*, *black*, *green*, \n *1st*, *2nd*, *3rd*, \n *half1*, *half2*, \n *orphans*, *gserie*, *5/8*, *zerozone*, \n *numbers*"
             )
             return
-        elif choice != "numeros":
+        elif choice != "numbers":
             result = random.randint(0, 36)
             updateUser(ctx.author.id, balance - amount)
             newBalance = getUser(ctx.author.id)["balance"]
 
             win = getWin(result, choice)
             mult = getMultiplier(win, choice)
-            amount *= mult
+            amount = int(amount * mult)
             updateUser(ctx.author.id, newBalance + amount)
             if "red" in numbas[str(result)]:
                 decor = "🔴"
@@ -466,7 +477,7 @@ async def mine(ctx):
     )
 
 
-@bot.command()
+@bot.command(help="Secret role for 200k")
 async def buyRole(ctx):
     grupo = ctx.guild
     userID = ctx.author.id
