@@ -5,13 +5,14 @@ import os
 import random
 import sqlite3
 import time
+from flask import Flask, jsonify
+from flask_cors import CORS
+import threading
 
 import discord
 import google.generativeai as genai
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from jokeapi import Jokes
 
 from blackjack.game import BlackjackGame
@@ -23,14 +24,8 @@ from roulette.roulette import *
 from shop.lootbox import *
 from shop.rewards import *
 
-app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = Flask(__name__)
+CORS(app)
 
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
@@ -543,6 +538,31 @@ async def ai(ctx, *, mensaje: str):
         await ctx.send("⚠️ Error al conectar con Gemini.")
         print("AI error:", repr(e))
 
+@app.route('api/all_users', methods=['GET'])
+def api_get_users():
+    try:
+        users = getAllUsers()
+        print("Usuarios obtenidos")
+        return jsonify(users), 200
+    except Exception as e:
+        print("Error obteniendo los usuarios")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('api/balance/<int:user_id>', methods=['GET'])
+def get_balance(user_id):
+    try:
+        balance = int(getUser(user_id)["balance"])
+        return jsonify(balance), 200
+    except Exception as e:
+        print("Algo mal al conseguir el balance")
+        return jsonify({"error": str(e)}), 500
+
+def run_api():
+    app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
+
+
 
 if token is not None:
+    t = threading.Thread(target=run_api, daemon=True)
+    t.start()
     bot.run(token, log_handler=handler, log_level=logging.DEBUG)
