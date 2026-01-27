@@ -538,7 +538,7 @@ async def ai(ctx, *, mensaje: str):
         await ctx.send("⚠️ Error al conectar con Gemini.")
         print("AI error:", repr(e))
 
-@app.route('api/all_users', methods=['GET'])
+@app.route('/api/all_users', methods=['GET'])
 def api_get_users():
     try:
         users = getAllUsers()
@@ -548,7 +548,7 @@ def api_get_users():
         print("Error obteniendo los usuarios")
         return jsonify({"error": str(e)}), 500
 
-@app.route('api/balance/<int:user_id>', methods=['GET'])
+@app.route('/api/balance/<int:user_id>', methods=['GET'])
 def get_balance(user_id):
     try:
         balance = int(getUser(user_id)["balance"])
