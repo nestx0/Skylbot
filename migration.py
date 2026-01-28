@@ -3,7 +3,6 @@ import sqlite3
 # Conectar a la base de datos existente
 conn = sqlite3.connect("bot.db")
 cursor = conn.cursor()
-cursor.execute("UPDATE users SET inventory = '[]'")
 
 try:
     # Esta es la instrucción mágica.
