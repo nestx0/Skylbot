@@ -250,6 +250,8 @@ def lvlUP(char: Character):
 
     firstStat = random.choice(stats)
     secondStat = random.choice(stats)
+    thirdStat = random.choice(stats)
+    fourthStat = random.choice(stats)
 
     char.level += 1
 
@@ -259,9 +261,12 @@ def lvlUP(char: Character):
     elif char.rarity == "Uncommon":
         char.stats[firstStat] += 4
         char.stats[secondStat] += 2
+        char.stats[thirdStat] += 1
     elif char.rarity == "Rare":
         char.stats[firstStat] += 6
         char.stats[secondStat] += 4
+        char.stats[thirdStat] += 3
+        char.stats[fourthStat] += 2
 
     return char
 
