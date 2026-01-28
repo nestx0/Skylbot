@@ -1,3 +1,4 @@
+import json
 import sqlite3
 
 conn = sqlite3.connect("bot.db", check_same_thread=False)
@@ -12,20 +13,40 @@ conn.commit()
 
 
 def getUser(userID):
-    cursor.execute("SELECT balance FROM users WHERE user_id=?", (userID,))
+    cursor.execute("SELECT balance, inventory FROM users WHERE user_id=?", (userID,))
     row = cursor.fetchone()
 
     if row is None:
-        cursor.execute("INSERT INTO users(user_id) VALUES(?)", (userID,))
+        cursor.execute(
+            "INSERT INTO users(user_id, balance, inventory) VALUES(?,?,?)",
+            (userID, 0, "[]"),
+        )
         conn.commit()
-        return {"balance": 0}
-    return {"balance": row[0]}
+        return {"balance": 0, "inventory": []}
+    balance = row[0]
+    inventoryText = row[1]
+
+    try:
+        inventoryLIST = json.loads(inventoryText)
+    except:
+        inventoryLIST = []
+
+    return {"balance": balance, "inventory": inventoryLIST}
 
 
 def updateUser(userID, balance=None):
     if balance is not None:
         cursor.execute("UPDATE users SET balance=? WHERE user_id=?", (balance, userID))
     conn.commit()
+
+
+def updateInventory(userID, inventoryLIST):
+    if inventoryLIST is not None:
+        inventoryJSON = json.dumps(inventoryLIST)
+        cursor.execute(
+            "UPDATE users SET inventory=? WHERE user_id=?", (inventoryJSON, userID)
+        )
+        conn.commit()
 
 
 def getLeaderboard():

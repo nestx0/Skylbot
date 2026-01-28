@@ -3,16 +3,15 @@ import itertools
 import logging
 import os
 import random
-import sqlite3
-import time
-from flask import Flask, jsonify
-from flask_cors import CORS
 import threading
+import time
 
 import discord
 import google.generativeai as genai
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 from jokeapi import Jokes
 
 from blackjack.game import BlackjackGame
@@ -21,6 +20,7 @@ from dataBase import *
 from ppt.ppt_game import PPTGame
 from ppt.ppt_view import PPTView
 from roulette.roulette import *
+from shop.gacha import *
 from shop.lootbox import *
 from shop.rewards import *
 
@@ -299,7 +299,7 @@ async def pay(ctx, member: discord.Member, amount: int):
 
 
 @bot.command()
-async def roulette(ctx, amount=None, choice=None, *,numbers: str | None = None):
+async def roulette(ctx, amount=None, choice=None, *, numbers: str | None = None):
 
     options = [
         "red",
@@ -404,7 +404,7 @@ async def roulette(ctx, amount=None, choice=None, *,numbers: str | None = None):
 @bot.command()
 async def ppt(ctx, amount: str):
     bet_amount = 0
-    balance = getUser(ctx.author.id)["balance"] 
+    balance = getUser(ctx.author.id)["balance"]
     balance = str(balance)
     if isinstance(amount, str) and amount.lower() == "allin":
         bet_amount = int(balance)
@@ -490,18 +490,57 @@ async def buyRole(ctx):
     balance = getUser(userID)["balance"]
 
     if balance < 200_000:
-        await ctx.send(
+        return await ctx.send(
             "In order to buy this secret role, you gotta have 200.000 bolivares"
         )
     else:
         await ctx.send("Purchasing secret role...")
         await miembro.add_role(rol)
         print("Success with assinging role")
+        return
+
+
+@bot.command()
+async def pull(ctx):
+    userID = ctx.author.id
+    balance = int(getUser(userID)["balance"])
+
+    if balance < 1:
+        return await ctx.send("To pull a character, you need 3000 bolivares")
+
+    print(f"Haciendo pull para {ctx.author.display_name}...")
+
+    balance -= 1
+    updateUser(userID, balance)
+
+    char = pullChar(userID)
+    if char.level > 1:
+        mensaje = f"♻️ **Repeated!** You already had a **{char.name}**. ¡It leveled up to **{char.level}**! ⬆️"
+    else:
+        mensaje = f"✨ **Congrats!** You got a new **{char.name}** ({char.rarity}) 🙀"
+
+    await ctx.send(mensaje)
+    embed = char.toEmbed()
+    archivo = discord.File(char.image, filename="char.jpeg")
+
+    embed.set_image(url="attachment://char.jpeg")
+    return await ctx.send(file=archivo, embed=embed)
+
+
+@bot.command()
+async def inventory(ctx):
+    userID = ctx.author.id
+    inventory = getInventory(userID)
+
+    if not inventory:
+        return await ctx.send("No inventory to show")
+    view = InventoryView(inventory)
+    embed, file = view.get_embed()
+    return await ctx.send(embed=embed, file=file, view=view)
 
 
 @bot.command()
 async def ai(ctx, *, mensaje: str):
-    """El usuario habla con Gemini (no bloqueante, sesión local para evitar races)"""
     try:
         await ctx.typing()
         # Serializamos acceso por si el SDK/objeto no es thread-safe
@@ -538,7 +577,8 @@ async def ai(ctx, *, mensaje: str):
         await ctx.send("⚠️ Error al conectar con Gemini.")
         print("AI error:", repr(e))
 
-@app.route('/api/all_users', methods=['GET'])
+
+@app.route("/api/all_users", methods=["GET"])
 def api_get_users():
     try:
         users = getAllUsers()
@@ -548,7 +588,8 @@ def api_get_users():
         print("Error obteniendo los usuarios")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/balance/<int:user_id>', methods=['GET'])
+
+@app.route("/api/balance/<int:user_id>", methods=["GET"])
 def get_balance(user_id):
     try:
         balance = int(getUser(user_id)["balance"])
@@ -557,9 +598,20 @@ def get_balance(user_id):
         print("Algo mal al conseguir el balance")
         return jsonify({"error": str(e)}), 500
 
-def run_api():
-    app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
 
+@app.route("/api/update_user/<int:user_id>", methods=["GET"])
+def update_balance(user_id):
+    try:
+        balance = int(getUser(user_id)["balance"])
+        updateUser(user_id, balance - 1)
+        return jsonify({"resp": "Todo bien"}), 500
+    except Exception as e:
+        print("Algo mal actualizando")
+        return jsonify({"error": str(e)}), 500
+
+
+def run_api():
+    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
 
 
 if token is not None:
