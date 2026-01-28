@@ -505,17 +505,17 @@ async def pull(ctx):
     userID = ctx.author.id
     balance = int(getUser(userID)["balance"])
 
-    if balance < 1:
-        return await ctx.send("To pull a character, you need 3000 bolivares")
+    if balance < 1000:
+        return await ctx.send("To pull a character, you need 1000 bolivares")
 
     print(f"Haciendo pull para {ctx.author.display_name}...")
 
-    balance -= 1
+    balance -= 1000
     updateUser(userID, balance)
 
     char = pullChar(userID)
     if char.level > 1:
-        mensaje = f"♻️ **Repeated!** You already had a **{char.name}**. ¡It leveled up to **{char.level}**! ⬆️"
+        mensaje = f"♻️ **Repeated!** You already had a **{char.name}**. It leveled up to **{char.level}**! ⬆️"
     else:
         mensaje = f"✨ **Congrats!** You got a new **{char.name}** ({char.rarity}) 🙀"
 

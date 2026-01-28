@@ -222,11 +222,11 @@ class InventoryView(View):
         embed.add_field(name="LVL", value=str(character.level))
 
         embed.set_image(url=f"attachment://char.jpeg")
-        embed.set_footer(text=f"Página {self.current_page + 1} de {len(self.data)}")
+        embed.set_footer(text=f"Page {self.current_page + 1} out of {len(self.data)}")
 
         return embed, file
 
-    @discord.ui.button(label="◀ Anterior", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="◀ Previous", style=discord.ButtonStyle.primary)
     async def prev_button(self, interaction: discord.Interaction, button: Button):
         self.current_page -= 1
         self.update_buttons()
@@ -236,7 +236,7 @@ class InventoryView(View):
             embed=embed, attachments=[file], view=self
         )
 
-    @discord.ui.button(label="Siguiente ▶", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.primary)
     async def next_button(self, interaction: discord.Interaction, button: Button):
         self.current_page += 1
         self.update_buttons()
