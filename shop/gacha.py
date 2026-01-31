@@ -194,6 +194,26 @@ class Character:
             "image": self.image,
         }
         return data
+    def getSellValue(self) -> int:
+        rarity = self.rarity
+        lvl = self.level
+
+        if rarity == "Common":
+            baseValue = 500
+        elif rarity == "Uncommon":
+            baseValue = 2000
+        elif rarity == "Rare":
+            baseValue = 7000
+        elif rarity == "Epic":
+            baseValue = 12000
+        elif rarity == "Legendary":
+            baseValue = 30000
+
+        finalValue = round(baseValue * lvl / 0.8)
+        return finalValue
+
+
+        
 
 
 class InventoryView(View):
@@ -216,6 +236,9 @@ class InventoryView(View):
             description=character.desc,
             color=discord.Color.gold(),
         )
+
+        embed.add_field(name="Rarity", value=character.rarity)
+        embed.add_field(name="Sell Value", value=str(character.getSellValue()))
 
         for stat, valor in character.stats.items():
             embed.add_field(name=stat, value=str(valor), inline=True)
@@ -298,3 +321,5 @@ def saveInventory(userID, inventory: list):
         listCharacters = [char.toDICT() for char in inventory]
         charactersJSON = json.dumps(listCharacters)
         updateInventory(userID, charactersJSON)
+
+    
