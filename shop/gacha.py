@@ -239,6 +239,7 @@ class InventoryView(View):
 
         embed.add_field(name="Rarity", value=character.rarity)
         embed.add_field(name="Sell Value", value=str(character.getSellValue()))
+        embed.add_field(name="\u200b", value="\u200b", inline=True) #Invisible field
 
         for stat, valor in character.stats.items():
             embed.add_field(name=stat, value=str(valor), inline=True)
