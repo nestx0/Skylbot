@@ -489,13 +489,14 @@ async def buyRole(ctx):
 
     balance = getUser(userID)["balance"]
 
-    if balance < 200_000:
+    if balance < 200000:
         return await ctx.send(
             "In order to buy this secret role, you gotta have 200.000 bolivares"
         )
     else:
+        updateUser(userID, balance - 200000)
         await ctx.send("Purchasing secret role...")
-        await miembro.add_role(rol)
+        await miembro.add_roles(rol)
         print("Success with assinging role")
         return
 
