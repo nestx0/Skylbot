@@ -539,6 +539,34 @@ async def inventory(ctx):
     embed, file = view.get_embed()
     return await ctx.send(embed=embed, file=file, view=view)
 
+@bot.command()
+async def sell(ctx,option):
+    userID = ctx.author.id
+    inventory = getInventory(userID)
+
+    if not option:
+        return await ctx.send("You have to choose a slot in your inventory")
+    if int(option) <= 0 or int(option) > len(inventory):
+        return await ctx.send("You have to select a valid position")
+
+    intOpt = int(option)
+    char = inventory[intOpt-1]
+
+    sellValue = char.getSellValue()
+
+    balance = getUser(userID)["balance"]
+    newBalance = balance + sellValue
+
+    updateUser(userID, newBalance)
+
+    inventory.pop(intOpt-1)
+
+    saveInventory(userID, inventory)
+
+    return await ctx.send(f"You sold your {char.name} for {sellValue} bolivares")
+
+
+
 
 @bot.command()
 async def ai(ctx, *, mensaje: str):
