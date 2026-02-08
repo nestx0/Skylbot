@@ -628,15 +628,58 @@ def get_balance(user_id):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/update_user/<int:user_id>", methods=["GET"])
-def update_balance(user_id):
+#@app.route("/api/update_user/<int:user_id>", methods=["GET"])
+#def update_balance(user_id):
+#    try:
+#        balance = int(getUser(user_id)["balance"])
+#        updateUser(user_id, balance - 1)
+#        return jsonify({"resp": "Todo bien"}), 500
+#    except Exception as e:
+#        print("Algo mal actualizando")
+#        return jsonify({"error": str(e)}), 500
+@app.route("api/gacha/pull/<int:userID>", methods=["GET"])
+def api_pull(userID):
     try:
-        balance = int(getUser(user_id)["balance"])
-        updateUser(user_id, balance - 1)
-        return jsonify({"resp": "Todo bien"}), 500
+        balance = int(getUser(userID)["balance"])
+
+        if balance < 1000:
+            return jsonify({"error" : "not enough bolivares"}), 400
+        balance -= 1000
+        updateUser(userID, balance)
+        char = pullChar(userID)
+        dictChar = char.toDICT()
+        return jsonify({
+            "status": "success",
+            "character": dictChar,
+            "new_balance": balance
+        }), 200
     except Exception as e:
-        print("Algo mal actualizando")
+        print("Algo mal con la tirada")
         return jsonify({"error": str(e)}), 500
+
+@app.route("api/gacha/tenpull/<int:userID>", methods=["GET"])
+def api_ten_pull(userID):
+    try:
+        balance = int(getUser(userID)["balance"])
+
+        if balance < 10000:
+            return jsonify({"error" : "not enough bolivares"}), 400
+
+        balance -= 10000
+        updateUser(userID, balance)
+        listChar = []
+        for i in range(10):
+            char = pullChar(userID)
+            listChar.append(char.toDICT())
+        return jsonify({
+            "status": "success",
+            "character": listChar,
+            "new_balance": balance
+        }), 200
+    except Exception as e:
+        print("Algo mal con la tirada")
+        return jsonify({"error": str(e)}), 500
+
 
 
 def run_api():
