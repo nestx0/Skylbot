@@ -637,7 +637,7 @@ def get_balance(user_id):
 #    except Exception as e:
 #        print("Algo mal actualizando")
 #        return jsonify({"error": str(e)}), 500
-@app.route("api/gacha/pull/<int:userID>", methods=["GET"])
+@app.route("/api/gacha/pull/<int:userID>", methods=["GET"])
 def api_pull(userID):
     try:
         balance = int(getUser(userID)["balance"])
@@ -657,7 +657,7 @@ def api_pull(userID):
         print("Algo mal con la tirada")
         return jsonify({"error": str(e)}), 500
 
-@app.route("api/gacha/tenpull/<int:userID>", methods=["GET"])
+@app.route("/api/gacha/tenpull/<int:userID>", methods=["GET"])
 def api_ten_pull(userID):
     try:
         balance = int(getUser(userID)["balance"])
