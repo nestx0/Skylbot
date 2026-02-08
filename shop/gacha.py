@@ -45,6 +45,60 @@ personajesComun = [
         "lvl": 1,
         "image": "images/characters/nuke_cat.jpeg",
     },
+    {
+        "id": 15,
+        "name": "Blub Cat",
+        "desc": "Doesn't care what you think, he has his one and only thought",
+        "rarity": "Common",
+        "stats": {"HP": 10, "ATK": 2, "DEF": 3, "SPE": 4, "LCK": 1},
+        "lvl": 1,
+        "image": "images/characters/blub_cat.jpeg",
+    },
+    {          
+        "id": 17,
+        "name": "Emo Cat",
+        "desc": "Listens to Linkin Park all day",
+        "rarity": "Common",
+        "stats": {"HP": 9, "ATK": 4, "DEF": 1, "SPE": 4, "LCK": 1},
+        "lvl": 1,
+        "image": "images/characters/emo_cat.jpeg",
+    },
+    {          
+        "id": 23,
+        "name": "Miguel",
+        "desc": "My pana Miguel",
+        "rarity": "Common",
+        "stats": {"HP": 9, "ATK": 4, "DEF": 2, "SPE": 2, "LCK": 2},
+        "lvl": 1,
+        "image": "images/characters/miguel.jpeg",
+    },
+    {          
+        "id": 24,
+        "name": "Nom Cat",
+        "desc": "He's about to get eaten, help him !!!",
+        "rarity": "Common",
+        "stats": {"HP": 10, "ATK": 3, "DEF": 1, "SPE": 1, "LCK": 5},
+        "lvl": 1,
+        "image": "images/characters/nom_cat.jpeg",
+    },
+    {          
+        "id": 27,
+        "name": "Smiling Cat",
+        "desc": "She's just happy to be out there",
+        "rarity": "Common",
+        "stats": {"HP": 11, "ATK": 1, "DEF": 4, "SPE": 2, "LCK": 3},
+        "lvl": 1,
+        "image": "images/characters/smile_cat.jpeg",
+    },
+    {
+        "id": 31,
+        "name": "Goblin Head Chef",
+        "desc": "Kids, what do you want for dinner tonight?",
+        "rarity": "Common",
+        "stats": {"HP": 8, "ATK": 2, "DEF": 3, "SPE": 3, "LCK": 2},
+        "lvl": 1,
+        "image": "images/characters/GoblinHeadChef.jpeg",
+    }
 ]
 personajesUncommon = [
     {
@@ -82,6 +136,42 @@ personajesUncommon = [
         "stats": {"HP": 16, "ATK": 2, "DEF": 6, "SPE": 4, "LCK": 3},
         "lvl": 1,
         "image": "images/characters/bleh_cat.jpeg",
+    },
+    {
+        "id": 14,
+        "name": "Big Floppa",
+        "desc": "The OG big cat of the internet",
+        "rarity": "Uncommon",
+        "stats": {"HP": 17, "ATK": 5, "DEF": 5, "SPE": 4, "LCK": 1},
+        "lvl": 1,
+        "image": "images/characters/big_floppa.jpeg",
+    },
+    {          
+        "id": 18,
+        "name": "About-To-Explode Cat",
+        "desc": "He's one step away from recreating Hiroshima",
+        "rarity": "Uncommon",
+        "stats": {"HP": 15, "ATK": 8, "DEF": 2, "SPE": 3, "LCK": 2},
+        "lvl": 1,
+        "image": "images/characters/explode_cat.jpeg",
+    },
+    {
+        "id": 22,
+        "name": "Jett (Low-poly)",
+        "desc": "BAN-BANG-BAN-BANF!",
+        "rarity": "Uncommon",
+        "stats": {"HP": 15, "ATK": 10, "DEF": 2, "SPE": 2, "LCK": 1},
+        "lvl": 1,
+        "image": "images/characters/Low-polyJett.jpeg",
+    },
+    {          
+        "id": 28,
+        "name": "Tiny Cat",
+        "desc": "Not smaller than a microbio tho",
+        "rarity": "Uncommon",
+        "stats": {"HP": 13, "ATK": 3, "DEF": 1, "SPE": 10, "LCK": 1},
+        "lvl": 1,
+        "image": "images/characters/tiny_cat.jpeg",
     },
 ]
 personajesRaro = [
@@ -121,6 +211,72 @@ personajesRaro = [
         "lvl": 1,
         "image": "images/characters/beluga_cat.jpeg",
     },
+    {        
+        "id": 13,
+        "name": "大开门 (Da Kai Men)",
+        "desc": "Carrot or tissue? Asking for a friend...",
+        "rarity": "Rare",
+        "stats": {"HP": 23, "ATK": 2, "DEF": 3, "SPE": 8, "LCK": 12},
+        "lvl": 1,
+        "image": "images/characters/DaKaiMen.jpeg",
+    },
+    {          
+        "id": 20,
+        "name": "Joker Cat",
+        "desc": "We live in a society...",
+        "rarity": "Rare",
+        "stats": {"HP": 20, "ATK": 5, "DEF": 4, "SPE": 8, "LCK": 8},
+        "lvl": 1,
+        "image": "images/characters/joker_cat.jpeg",
+    },
+    {          
+        "id": 69,
+        "name": "Mr Penis",
+        "desc": "MR PENIS HIMSELF!!!",
+        "rarity": "Rare",
+        "stats": {"HP": 21, "ATK": 6, "DEF": 9, "SPE": 6, "LCK": 4},
+        "lvl": 1,
+        "image": "images/characters/mr_penis.jpeg",
+    },
+]
+
+personajesEpico = [
+    {        
+        "id": 16,
+        "name": "Counter-Terrorist Cat",
+        "desc": "His skills came from playing CS2 all day long",
+        "rarity": "Epic",
+        "stats": {"HP": 35, "ATK": 10, "DEF": 15, "SPE": 8, "LCK": 10},
+        "lvl": 1,
+        "image": "images/characters/cs_cat.jpeg",
+    },
+    {          
+        "id": 19,
+        "name": "Floppa Whatsapp",
+        "desc": "Evolved version of Floppa. He learnt how to use stickers",
+        "rarity": "Epic",
+        "stats": {"HP": 35, "ATK": 15, "DEF": 8, "SPE": 15, "LCK": 4},
+        "lvl": 1,
+        "image": "images/characters/floppa_whatsapp.jpeg",
+    },
+    {          
+        "id": 21,
+        "name": "Juan",
+        "desc": "Juan",
+        "rarity": "Epic",
+        "stats": {"HP": 38, "ATK": 7, "DEF": 22, "SPE": 10, "LCK": 1},
+        "lvl": 1,
+        "image": "images/characters/juan.jpeg",
+    },
+    {          
+        "id": 26,
+        "name": "Obscure Cat",
+        "desc": "It knows your deepest secrets",
+        "rarity": "Epic",
+        "stats": {"HP": 35, "ATK": 24, "DEF": 10, "SPE": 10, "LCK": 2},
+        "lvl": 1,
+        "image": "images/characters/obscure_cat.jpeg",
+    },
 ]
 
 
@@ -132,10 +288,12 @@ def pullChar(userID):
 
     if rarity >= 0 and rarity <= 60:
         char = Character(random.choice(personajesComun))
-    elif rarity > 60 and rarity <= 90:
+    elif rarity > 60 and rarity <= 85:
         char = Character(random.choice(personajesUncommon))
-    elif rarity > 90 and rarity <= 100:
+    elif rarity > 85 and rarity <= 95:
         char = Character(random.choice(personajesRaro))
+    elif rarity > 95 and rarity <= 100:
+        char = Character(random.choice(personajesEpico))
 
     encontrado = False
     if inventory:
@@ -205,7 +363,7 @@ class Character:
         elif rarity == "Rare":
             baseValue = 7000
         elif rarity == "Epic":
-            baseValue = 12000
+            baseValue = 15000
         elif rarity == "Legendary":
             baseValue = 30000
 
@@ -280,16 +438,25 @@ def lvlUP(char: Character):
     char.level += 1
 
     if char.rarity == "Common":
+        char.stats["HP"] += 3
         char.stats[firstStat] += 2
         char.stats[secondStat] += 1
     elif char.rarity == "Uncommon":
+        char.stats["HP"] += 6
         char.stats[firstStat] += 4
         char.stats[secondStat] += 2
         char.stats[thirdStat] += 1
     elif char.rarity == "Rare":
+        char.stats["HP"] += 10
         char.stats[firstStat] += 6
         char.stats[secondStat] += 4
         char.stats[thirdStat] += 3
+        char.stats[fourthStat] += 2
+    elif char.rarity == "Epic":
+        char.stats["HP"] += 15
+        char.stats[firstStat] += 10
+        char.stats[secondStat] += 8
+        char.stats[thirdStat] += 5
         char.stats[fourthStat] += 2
 
     return char
