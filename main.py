@@ -298,7 +298,7 @@ async def pay(ctx, member: discord.Member, amount: int):
         await ctx.send(f"Succesfully sent {amount} to {member.display_name}")
 
 
-@bot.command()
+@bot.command(help="A classic game of roulette with some options")
 async def roulette(ctx, amount=None, choice=None, *, numbers: str | None = None):
 
     options = [
@@ -401,7 +401,7 @@ async def roulette(ctx, amount=None, choice=None, *, numbers: str | None = None)
                 )
 
 
-@bot.command()
+@bot.command(help="Let's play rock, paper, scissors")
 async def ppt(ctx, amount: str):
     bet_amount = 0
     balance = getUser(ctx.author.id)["balance"]
@@ -431,7 +431,7 @@ async def ppt(ctx, amount: str):
     await ctx.send(embed=embed, view=view, file=file)
 
 
-@bot.command()
+@bot.command(help="Do you wanna test your luck with a lootbox ?")
 async def lootbox(ctx):
 
     userID = ctx.author.id
@@ -448,7 +448,7 @@ async def lootbox(ctx):
     )
 
 
-@bot.command()
+@bot.command(help="Grab a reward if you're quick enough")
 async def mine(ctx):
     global mio_activo, mio_reclamado
 
@@ -501,7 +501,7 @@ async def buyRole(ctx):
         return
 
 
-@bot.command()
+@bot.command(help="Get one of many characters to sell or fight with them")
 async def pull(ctx):
     userID = ctx.author.id
     balance = int(getUser(userID)["balance"])
@@ -528,7 +528,7 @@ async def pull(ctx):
     return await ctx.send(file=archivo, embed=embed)
 
 
-@bot.command()
+@bot.command(help="Shows your inventory of companions")
 async def inventory(ctx):
     userID = ctx.author.id
     inventory = getInventory(userID)
@@ -539,7 +539,7 @@ async def inventory(ctx):
     embed, file = view.get_embed()
     return await ctx.send(embed=embed, file=file, view=view)
 
-@bot.command()
+@bot.command(help="Sell one of your companions for bolivares")
 async def sell(ctx,option):
     userID = ctx.author.id
     inventory = getInventory(userID)
@@ -565,10 +565,53 @@ async def sell(ctx,option):
 
     return await ctx.send(f"You sold your {char.name} for {sellValue} bolivares")
 
+@bot.command(help="Set a defender in case someone wants to fight you")
+async def setDefender(ctx, option: int):
+    userID = ctx.author.id
+    inventory = getInventory(userID)
+
+    if int(option) <= 0 or int(option) > len(inventory):
+        return await ctx.send("You have to select a valid position")
+
+    charDef = inventory[option-1]
+    aux = inventory[0]
+    inventory[0] = charDef
+    inventory[option-1] = aux
+
+    saveInventory(userID, inventory)
+
+    return await ctx.send(f"Your defender is now {charDef.name}")
+
+@bot.command(help="Train a companion of your choice, with a cooldown obviously")
+@commands.cooldown(1, 3600, commands.BucketType.user)
+async def train(ctx, option: int):
+    userID = ctx.author.id
+    inventory = getInventory(userID)
+
+    if int(option) <= 0 or int(option) > len(inventory):
+        return await ctx.send("You have to select a valid position")
+
+    char = inventory[option-1]
+
+    if char.rarity == "Common":
+        for i in range(10):
+            lvlUP(char)
+        return await ctx.send(f"Your {char.name} leveled up 10 times !")
+    elif char.rarity == "Uncommon":
+        for i in range(4):
+            lvlUP(char)
+        return await ctx.send(f"Your {char.name} leveled up 5 times !")
+    elif char.rarity == "Rare":
+        for i in range(2):
+            lvlUP(char)
+        return await ctx.send(f"Your {char.name} leveled up 3 times !")
+    elif char.rarity == "Epic":
+        lvlUP(char)
+        return await ctx.send(f"Your {char.name} leveled up 1 time !")
 
 
 
-@bot.command()
+@bot.command(help="Ask Skylbot about anything, it will answer")
 async def ai(ctx, *, mensaje: str):
     try:
         await ctx.typing()
