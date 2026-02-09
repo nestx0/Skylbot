@@ -485,7 +485,7 @@ def getInventory(userID) -> list:
 
 
 def saveInventory(userID, inventory: list):
-    if inventory:
+    if inventory is not None:
         listCharacters = [char.toDICT() for char in inventory]
         charactersJSON = json.dumps(listCharacters)
         updateInventory(userID, charactersJSON)
