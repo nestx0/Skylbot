@@ -589,6 +589,7 @@ async def train(ctx, option: int):
     inventory = getInventory(userID)
 
     if int(option) <= 0 or int(option) > len(inventory):
+        ctx.command.reset_cooldown(ctx)
         return await ctx.send("You have to select a valid position")
 
     char = inventory[option-1]
@@ -596,18 +597,29 @@ async def train(ctx, option: int):
     if char.rarity == "Common":
         for i in range(10):
             lvlUP(char)
+        inventory[option-1] = char
+        saveInventory(userID, inventory)
         return await ctx.send(f"Your {char.name} leveled up 10 times !")
     elif char.rarity == "Uncommon":
-        for i in range(4):
+        for i in range(5):
             lvlUP(char)
+
+        inventory[option-1] = char
+        saveInventory(userID, inventory)
         return await ctx.send(f"Your {char.name} leveled up 5 times !")
     elif char.rarity == "Rare":
         for i in range(2):
             lvlUP(char)
-        return await ctx.send(f"Your {char.name} leveled up 3 times !")
+
+        inventory[option-1] = char
+        saveInventory(userID, inventory)
+        return await ctx.send(f"Your {char.name} leveled up 2 times !")
     elif char.rarity == "Epic":
         lvlUP(char)
+        inventory[option-1] = char
+        saveInventory(userID, inventory)
         return await ctx.send(f"Your {char.name} leveled up 1 time !")
+
 
 
 
