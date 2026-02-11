@@ -282,10 +282,8 @@ personajesEpico = [
 
 
 def pullChar(userID):
-    print("Pulling")
     rarity = random.randint(0, 100)
     inventory = getInventory(userID)
-    print("Got inv")
 
     if rarity >= 0 and rarity <= 60:
         char = Character(random.choice(personajesComun))
@@ -300,9 +298,7 @@ def pullChar(userID):
     if inventory:
         for i, item in enumerate(inventory):
             if item.id == char.id:
-                print("Leveling up")
                 inventory[i] = lvlUP(inventory[i])
-                print("Finish leveling up")
                 encontrado = True
                 char = inventory[i]
                 break
@@ -310,10 +306,7 @@ def pullChar(userID):
             inventory.append(char)
     else:
         inventory.append(char)
-    print("Finish logic")
     saveInventory(userID, inventory)
-    print("Saved")
-    print(inventory)
 
     return char
 
