@@ -506,12 +506,12 @@ async def pull(ctx):
     userID = ctx.author.id
     balance = int(getUser(userID)["balance"])
 
-    if balance < 1000:
-        return await ctx.send("To pull a character, you need 1000 bolivares")
+    if balance < 3000:
+        return await ctx.send("To pull a character, you need 3000 bolivares")
 
     print(f"Haciendo pull para {ctx.author.display_name}...")
 
-    balance -= 1000
+    balance -= 3000
     updateUser(userID, balance)
 
     char = pullChar(userID)
@@ -672,6 +672,16 @@ def api_get_users():
         print("Error obteniendo los usuarios")
         return jsonify({"error": str(e)}), 500
 
+@app.route("/api/user/<int:user_id>", methods=["GET"])
+def get_user(user_id):
+    try:
+        user = getUser(user_id)
+        print("Usuario conseguido")
+        return jsonify(user), 200
+    except Exception as e:
+        print("Error obteniendo al user")
+        return jsonify({"error" : str(e)}), 500
+
 
 @app.route("/api/balance/<int:user_id>", methods=["GET"])
 def get_balance(user_id):
@@ -697,9 +707,9 @@ def api_pull(userID):
     try:
         balance = int(getUser(userID)["balance"])
 
-        if balance < 1000:
+        if balance < 3000:
             return jsonify({"error" : "not enough bolivares"}), 400
-        balance -= 1000
+        balance -= 3000
         updateUser(userID, balance)
         char = pullChar(userID)
         dictChar = char.toDICT()
@@ -717,10 +727,10 @@ def api_ten_pull(userID):
     try:
         balance = int(getUser(userID)["balance"])
 
-        if balance < 10000:
+        if balance < 30000:
             return jsonify({"error" : "not enough bolivares"}), 400
 
-        balance -= 10000
+        balance -= 30000
         updateUser(userID, balance)
         listChar = []
         for i in range(10):
@@ -734,8 +744,6 @@ def api_ten_pull(userID):
     except Exception as e:
         print("Algo mal con la tirada")
         return jsonify({"error": str(e)}), 500
-
-
 
 def run_api():
     app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)

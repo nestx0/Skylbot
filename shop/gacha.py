@@ -1,5 +1,6 @@
 import json
 import random
+import copy
 
 import discord
 from discord.ui import Button, View
@@ -370,10 +371,6 @@ class Character:
         finalValue = round(baseValue * lvl / 0.8)
         return finalValue
 
-
-        
-
-
 class InventoryView(View):
     def __init__(self, data):
         super().__init__(timeout=60)
@@ -427,7 +424,6 @@ class InventoryView(View):
             embed=embed, attachments=[file], view=self
         )
 
-
 def lvlUP(char: Character):
 
     firstStat = random.choice(stats)
@@ -461,6 +457,48 @@ def lvlUP(char: Character):
 
     return char
 
+def fight(char1: Character, char2: Character):
+    attacker = copy.deepcopy(char1)
+    defender = copy.deepcopy(char2)
+
+    finish = False
+    resumen = f""
+
+    if defender.stats["SPE"] > attacker.stats["SPE"]:
+        defender, attacker = attacker, defender
+
+    while attacker.stats["HP"] > 0 and defender.stats["HP"] > 0:
+        atkDamageA = round((100 * attacker.stats["ATK"]) / (100 + defender.stats["DEF"]))
+        atkDamageD = round((100 * defender.stats["ATK"]) / (100 + attacker.stats["DEF"]))
+
+        defender.stats["HP"] -= atkDamageA
+
+        if defender.stats["HP"] <= 0:
+            defender.stats["HP"] = 0
+            finish = True
+
+        resumen += f"{attacker.name} dealt {atkDamageA} damage to {defender.name}. {defender.name}'s current HP is {defender.stats["HP"]}\n" 
+        
+        if finish == True:
+            resumen += f"Fight is over, {attacker.name} won !!"
+            break
+
+        attacker.stats["HP"] -= atkDamageD
+
+        if defender.stats["HP"] <= 0:
+            defender.stats["HP"] = 0
+            finish = True
+
+        resumen += f"{defender.name} dealt {atkDamageD} damage to {attacker.name}. {attacker.name}'s current HP is {attacker.stats["HP"]}\n" 
+        
+        if finish == True:
+            resumen += f"Fight is over, {defender.name} won !!"
+            break
+
+        attacker.stats["ATK"] *= 2
+        defender.stats["ATK"] *= 2
+
+    return resumen
 
 def getInventory(userID) -> list:
     data = getUser(userID)
@@ -490,4 +528,3 @@ def saveInventory(userID, inventory: list):
         charactersJSON = json.dumps(listCharacters)
         updateInventory(userID, charactersJSON)
 
-    
