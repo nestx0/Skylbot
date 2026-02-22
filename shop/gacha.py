@@ -280,6 +280,37 @@ personajesEpico = [
     },
 ]
 
+bosses = [
+    {          
+        "id": 1,
+        "name": "Mr Balls",
+        "desc": "The evil brother of Mr. Penis",
+        "rarity": "Boss",
+        "stats": {"HP": 1811, "ATK": 388, "DEF": 405, "SPE": 442, "LCK": 400},
+        "lvl": 69, 
+        "image": "images/characters/mr_balls.jpeg",
+    },
+    {     
+        "id": 2,
+        "name": "Pringles Floppa",
+        "desc": "Copies all your stats, but better",
+        "rarity": "Boss",
+        "stats": {"HP": "???", "ATK": "???", "DEF": "???", "SPE": "???", "LCK": "???"},
+        "lvl": "???",
+        "image": "images/characters/pringles_floppa.jpeg",
+    },
+    {          
+        "id": 3,
+        "name": "Hacienda",
+        "desc": "Taking half your income, and stats",
+        "rarity": "Boss",
+        "stats": {"HP": 2026, "ATK": 300, "DEF": 350, "SPE": 1, "LCK": 7000},
+        "lvl": 1,
+        "image": "images/characters/hacienda.jpeg",
+    },
+    
+]
+
 
 def pullChar(userID):
     rarity = random.randint(0, 100)
@@ -380,7 +411,7 @@ class InventoryView(View):
         file = discord.File(character.image, filename="char.jpeg")
 
         embed = discord.Embed(
-            title=f"🎒 Inventario: {character.name}",
+            title=f"🎒 Inventory: {character.name}",
             description=character.desc,
             color=discord.Color.gold(),
         )
@@ -403,6 +434,60 @@ class InventoryView(View):
         self.current_page -= 1
         self.update_buttons()
 
+        embed, file = self.get_embed()
+        await interaction.response.edit_message(
+            embed=embed, attachments=[file], view=self
+        )
+
+    @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.primary)
+    async def next_button(self, interaction: discord.Interaction, button: Button):
+        self.current_page += 1
+        self.update_buttons()
+        embed, file = self.get_embed()
+        await interaction.response.edit_message(
+            embed=embed, attachments=[file], view=self
+        )
+class BossListView(View):
+    def __init__(self, data):
+        super().__init__(timeout=60)
+        self.data = [Character(boss_dict) for boss_dict in bosses]
+        self.current_page = 0
+        self.update_buttons()
+
+    def update_buttons(self):
+        self.prev_button.disabled = self.current_page == 0
+        self.next_button.disabled = self.current_page == len(self.data) - 1
+
+    def get_embed(self):
+        boss = self.data[self.current_page]
+        file = discord.File(boss.image, filename="boss.jpeg")
+
+        embed = discord.Embed(
+            title=f"👹 Boss Arena: {boss.name}",
+            description=boss.desc,
+            color=discord.Color.dark_red(), 
+        )
+
+        embed.add_field(name="Difficulty", value=boss.rarity)
+        
+        boss_id = self.current_page + 1
+        embed.add_field(name="Boss ID", value=f"#{boss_id}")
+        embed.add_field(name="\u200b", value="\u200b", inline=True) 
+
+        for stat, valor in boss.stats.items():
+            embed.add_field(name=stat, value=str(valor), inline=True)
+        embed.add_field(name="LVL", value=str(boss.level))
+
+        embed.set_image(url="attachment://boss.jpeg")
+        
+        embed.set_footer(text=f"Boss {boss_id} out of {len(self.data)} | Use *boss fight {boss_id} to challenge!")
+
+        return embed, file
+
+    @discord.ui.button(label="◀ Previous", style=discord.ButtonStyle.primary)
+    async def prev_button(self, interaction: discord.Interaction, button: Button):
+        self.current_page -= 1
+        self.update_buttons()
         embed, file = self.get_embed()
         await interaction.response.edit_message(
             embed=embed, attachments=[file], view=self
@@ -450,48 +535,111 @@ def lvlUP(char: Character):
 
     return char
 
-def fight(char1: Character, char2: Character):
-    attacker = copy.deepcopy(char1)
-    defender = copy.deepcopy(char2)
+def fight(char1, char2):
+    p1 = copy.deepcopy(char1)
+    p2 = copy.deepcopy(char2)
+    resumen = ""
 
-    finish = False
-    resumen = f""
+    p1_max_hp = p1.stats["HP"]
+    p2_max_hp = p2.stats["HP"]
 
-    if defender.stats["SPE"] > attacker.stats["SPE"]:
-        defender, attacker = attacker, defender
+    p1_init = p1.stats["SPE"] * random.uniform(0.9, 1.1)
+    p2_init = p2.stats["SPE"] * random.uniform(0.9, 1.1)
+    
+    if p2_init > p1_init:
+        attacker, defender = p2, p1
+        atk_max_hp, def_max_hp = p2_max_hp, p1_max_hp
+    else:
+        attacker, defender = p1, p2
+        atk_max_hp, def_max_hp = p1_max_hp, p2_max_hp
 
-    while attacker.stats["HP"] > 0 and defender.stats["HP"] > 0:
-        atkDamageA = round((100 * attacker.stats["ATK"]) / (100 + defender.stats["DEF"]))
-        atkDamageD = round((100 * defender.stats["ATK"]) / (100 + attacker.stats["DEF"]))
+    resumen += f"⚔️ **{attacker.name}** vs **{defender.name}**!\n"
+    resumen += f"💨 **{attacker.name}** is faster and takes the first strike.\n\n"
 
-        defender.stats["HP"] -= atkDamageA
+    turno = 1
+    frenzy_multiplier = 1.0 # En lugar de *= 2, le sumaremos 0.3 cada turno
+
+    while p1.stats["HP"] > 0 and p2.stats["HP"] > 0:
+        
+        if random.randint(1, 100) <= 5:
+            if attacker.stats["LCK"] > defender.stats["LCK"]:
+                heal = int(atk_max_hp * 0.15)
+                attacker.stats["HP"] += heal
+                resumen += f"🍀 **LUCKY DROP!** {attacker.name} found a health potion and recovered {heal} HP!\n"
+            else:
+                dmg = int(defender.stats["HP"] * 0.10)
+                defender.stats["HP"] -= dmg
+                resumen += f"⚡ **ARENA HAZARD!** A stray lightning hit {defender.name} for {dmg} damage!\n"
+
+        dodge_chance = min(25.0, (defender.stats["SPE"] / attacker.stats["SPE"]) * 5 + (defender.stats["LCK"] / 20))
+        
+        if random.uniform(0, 100) < dodge_chance:
+            resumen += f"🛡️ **Turn {turno}:** {defender.name} gracefully dodged the attack!\n"
+        else:
+            base_dmg = (100 * attacker.stats["ATK"]) / (100 + defender.stats["DEF"])
+            varianza = random.uniform(0.85, 1.15)
+            
+            desperation_mult = 1.0
+            is_desperate = False
+            if attacker.stats["HP"] <= (atk_max_hp * 0.20):
+                desperation_mult = 1.5
+                is_desperate = True
+
+            prob_critico = min(50.0, attacker.stats["LCK"] / 10.0) 
+            es_critico = random.uniform(0, 100) < prob_critico 
+            multiplicador_crit = 1.5 if es_critico else 1.0 
+
+            final_dmg = round(base_dmg * varianza * multiplicador_crit * desperation_mult * frenzy_multiplier)
+            if final_dmg < 1: final_dmg = 1
+                
+            defender.stats["HP"] -= final_dmg
+            if defender.stats["HP"] < 0: defender.stats["HP"] = 0
+
+            crit_text = " **(CRITICAL HIT! 💥)**" if es_critico else ""
+            desp_text = " **(DESPERATION STRIKE! 💢)**" if is_desperate else ""
+            
+            resumen += f"🥊 **Turn {turno}:** {attacker.name} deals {final_dmg} damage!{crit_text}{desp_text} ({defender.name} HP: {defender.stats['HP']})\n"
 
         if defender.stats["HP"] <= 0:
-            defender.stats["HP"] = 0
-            finish = True
-
-        resumen += f"{attacker.name} dealt {atkDamageA} damage to {defender.name}. {defender.name}'s current HP is {defender.stats["HP"]}\n" 
-        
-        if finish == True:
-            resumen += f"Fight is over, {attacker.name} won !!"
+            resumen += f"\n🏆 **FIGHT OVER! {attacker.name} stands victorious!**"
             break
 
-        attacker.stats["HP"] -= atkDamageD
-
-        if defender.stats["HP"] <= 0:
-            defender.stats["HP"] = 0
-            finish = True
-
-        resumen += f"{defender.name} dealt {atkDamageD} damage to {attacker.name}. {attacker.name}'s current HP is {attacker.stats["HP"]}\n" 
+        attacker, defender = defender, attacker
+        atk_max_hp, def_max_hp = def_max_hp, atk_max_hp
+        turno += 1
         
-        if finish == True:
-            resumen += f"Fight is over, {defender.name} won !!"
+        frenzy_multiplier += 0.3 
+        
+        if turno == 10:
+            resumen += "\n🔥 **SUDDEN DEATH! ALL DAMAGE IS MASSIVELY INCREASED!** 🔥\n"
+
+        if turno > 20:
+            resumen += "\n⏳ **Time Limit Reached! It's a DRAW!**"
             break
 
-        attacker.stats["ATK"] *= 2
-        defender.stats["ATK"] *= 2
+    return resumen, attacker.name
 
-    return resumen
+def bossHandler(charP, option):
+    player = copy.deepcopy(charP)
+    boss_raw = copy.deepcopy(bosses[option])
+
+    boss = Character(boss_raw)
+
+    if boss.name == "Hacienda":
+        player.stats["HP"] /= 2
+        player.stats["ATK"] /= 2
+        player.stats["DEF"] /= 2
+        player.stats["SPE"] /= 2
+        player.stats["LCK"] /= 2
+    if boss.name == "Pringles Floppa":
+        boss.stats["HP"] = player.stats["HP"] * 1.15
+        boss.stats["ATK"] = player.stats["ATK"] * 1.15
+        boss.stats["DEF"] = player.stats["DEF"] * 1.15
+        boss.stats["SPE"] = player.stats["SPE"] * 1.15
+        boss.stats["LCK"] = player.stats["LCK"] * 1.15
+
+    resumen, winner = fight(player, boss)
+    return resumen, winner       
 
 def getInventory(userID) -> list:
     data = getUser(userID)

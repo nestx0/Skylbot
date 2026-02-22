@@ -620,8 +620,37 @@ async def train(ctx, option: int):
         saveInventory(userID, inventory)
         return await ctx.send(f"Your {char.name} leveled up 1 time !")
 
+@bot.command(help="Fight some bosses or something")
+async def boss(ctx, option: str | None = None, boss: int | None = None, char: int | None = None):
+
+    if not option:
+        return await ctx.send("Didn't choose an option, either type *boss list or fight <option>")
+    if option == "list":
+        view = BossListView(bosses)
+        embed, file = view.get_embed()
+        return await ctx.send(embed=embed, file=file, view=view)
+    elif option == "fight":
+        if boss == None or char == None:
+            return await ctx.send("❌ You need to specify the Boss and your Character. Example: `*boss fight 1 3`")
+
+        if boss <= 0 or boss > len(bosses):
+            return await ctx.send("❌ That Boss ID doesn't exist.")
+        userID = ctx.author.id
+        inventory = getInventory(userID)
+
+        charPlayer = inventory[char-1]
+
+        resumen, winner = bossHandler(charPlayer, bosses[boss-1])
+
+        if len(resumen) > 1990:
+            await ctx.send(resumen[:1990] + "...")
+            await ctx.send("..." + resumen[1990:])
+        else:
+            await ctx.send(resumen)
+        return 
 
 
+        
 
 @bot.command(help="Ask Skylbot about anything, it will answer")
 async def ai(ctx, *, mensaje: str):
