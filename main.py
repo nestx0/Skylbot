@@ -640,7 +640,7 @@ async def boss(ctx, option: str | None = None, boss: int | None = None, char: in
 
         charPlayer = inventory[char-1]
 
-        resumen, winner = bossHandler(charPlayer, bosses[boss-1])
+        resumen, winner = bossHandler(charPlayer, boss)
 
         if len(resumen) > 1990:
             await ctx.send(resumen[:1990] + "...")

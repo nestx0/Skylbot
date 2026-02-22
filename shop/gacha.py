@@ -619,7 +619,7 @@ def fight(char1, char2):
 
     return resumen, attacker.name
 
-def bossHandler(charP, option):
+def bossHandler(charP, option: int):
     player = copy.deepcopy(charP)
     boss_raw = copy.deepcopy(bosses[option])
 
