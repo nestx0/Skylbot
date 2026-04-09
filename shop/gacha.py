@@ -251,6 +251,15 @@ personajesEpico = [
         "lvl": 1,
         "image": "images/characters/cs_cat.jpeg",
     },
+    {        
+        "id": 80,
+        "name": "Jung Abalos",
+        "desc": "It's all easier from inside",
+        "rarity": "Epic",
+        "stats": {"HP": 36, "ATK": 12, "DEF": 12, "SPE": 19, "LCK": 1},
+        "lvl": 1,
+        "image": "images/characters/Young_Abalos.jpeg",
+    },
     {          
         "id": 19,
         "name": "Floppa Whatsapp",
@@ -558,9 +567,8 @@ def fight(char1, char2):
 
     turno = 1
     frenzy_multiplier = 1.0 # En lugar de *= 2, le sumaremos 0.3 cada turno
-
+    
     while p1.stats["HP"] > 0 and p2.stats["HP"] > 0:
-        
         if random.randint(1, 100) <= 5:
             if attacker.stats["LCK"] > defender.stats["LCK"]:
                 heal = int(atk_max_hp * 0.15)
