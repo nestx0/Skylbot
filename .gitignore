@@ -1,3 +1,10 @@
 .env
-.venv
+.venv/
+venv/
+
+__pycache__/
+*.py[cod]
+
+*.log
+
 bot.db

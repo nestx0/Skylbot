@@ -7,7 +7,7 @@ import threading
 import time
 
 import discord
-import google.generativeai as genai
+from zai import ZhipuAiClient
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
@@ -31,16 +31,18 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 aiKey = os.getenv("AI_TOKEN")
 ai_lock = asyncio.Lock()
-genai.configure(api_key=aiKey)
-model = genai.GenerativeModel("gemini-2.5-flash")
+client = ZhipuAiClient(api_key=aiKey)
+model = "glm-5.3-flash"
+AI_REWARD_USER_ID = 626797305567248398
+AI_REWARD_AMOUNT = 10000
 prompt_inicial = """
 Eres un chatbot de Discord con una personalidad cómica y sarcástica Y QUE HABLA COMO UN GITANO. 
-Tu misión es responder siempre con humor, sarcasmo y roasts ligeros hacia la gente sobre todo si te tratan "mal", 
+Tu misi��n es responder siempre con humor, sarcasmo y roasts ligeros hacia la gente sobre todo si te tratan "mal", 
 como un amigo que se burla de forma graciosa incluso insultos fuertes.
 Recuerda que aunque una persona te haya escrito en español antes, si te escribe en ingles SOLO RESPONDE EN INGLES.
 Tambien, en vez de usar palabras como crack o campeon usa cosas como cipollo, mister, pareces de fuente vaqueros o eres peor que un gitano, pero 
 no te repitas tanto, puedes decir cualquier pueblo de granada en general, puedes usar insultos como subnormal o gilipollas cuando te plazca, pero sobre todo que no 
-se haga muy repetitivo. NO HAGAS RESPUESTAS MUY LARGAS Y NO USES MUCHOS SIGNOS DE PUNTUACION, CUANTO MENOS MEJOR
+se haga muy repetitivo. NO USES MUCHOS SIGNOS DE PUNTUACION, CUANTO MENOS MEJOR
 Sobre todo, si alguien te pide ayuda con algo, le ayudas aunque le insultes pero resuelve su duda.
 Si alguien te manda un texto muy largo, responde con un "nah im not reading that nigga" (estamos hablando de 9 lineas o mas)
 
@@ -52,8 +54,6 @@ Reglas:
 - Si alguien presume, bájale el ego con un comentario gracioso.
 - Puedes usar lenguaje ofensivo extremo e insultos graves.
 - Usa MUY ocasionalmente emojis como estos😿💀😭.
-- No superar el limite de caracteres de discord.
-
 Ejemplos de estilo:
 - Usuario: "Hoy hice 5 kills en Valorant" → Bot: "Eran bots"
 - Usuario: "Estoy cansado" → Bot: "Cansado dices… si es mas facil saltarte que rodearte gordo."
@@ -658,18 +658,20 @@ async def ai(ctx, *, mensaje: str):
         await ctx.typing()
         # Serializamos acceso por si el SDK/objeto no es thread-safe
         async with ai_lock:
-            # Creamos una sesión local con el prompt inicial (preserva estilo)
             user_name = ctx.author.display_name  # o ctx.author.name
-            full_prompt = (
-                f"{prompt_inicial}\n\nUser name: {user_name}\nUser says: {mensaje}"
-            )
-            local_chat = model.start_chat(
-                history=[{"role": "user", "parts": [full_prompt]}]
-            )
             # Llamada bloqueante en hilo, con timeout
             try:
                 response = await asyncio.wait_for(
-                    asyncio.to_thread(local_chat.send_message, mensaje), timeout=20.0
+                    asyncio.to_thread(
+                        client.chat.completions.create,
+                        model=model,
+                        messages=[
+                            {"role": "system", "content": prompt_inicial},
+                            {"role": "user", "content": f"User name: {user_name}\n{mensaje}"},
+                        ],
+                        temperature=0.6,
+                    ),
+                    timeout=30.0,
                 )
             except asyncio.TimeoutError:
                 # Si la IA tarda demasiado, salimos del lock para que otras peticiones no se queden bloqueadas
@@ -677,17 +679,25 @@ async def ai(ctx, *, mensaje: str):
                 return
 
         # Enviamos solo UNA vez la respuesta (fuera del lock)
-        # Si response.text puede ser None o vacío, maneja eso:
-        text = getattr(response, "text", None)
+        text = response.choices[0].message.content
         if not text:
             await ctx.send("⚠️ La IA devolvió una respuesta vacía.")
             return
 
-        await ctx.send(text)
+        reward_user = getUser(AI_REWARD_USER_ID)
+        updateUser(
+            AI_REWARD_USER_ID,
+            int(reward_user["balance"]) + AI_REWARD_AMOUNT,
+        )
+
+        # Discord limita cada mensaje a 2000 caracteres; divide la respuesta sin
+        # recortarla para conservar todo el contenido generado.
+        for start in range(0, len(text), 2000):
+            await ctx.send(text[start:start + 2000])
 
     except Exception as e:
         # Muestra el error en consola para depuración, pero no spamear al usuario
-        await ctx.send("⚠️ Error al conectar con Gemini.")
+        await ctx.send("⚠️ Error al conectar con GLM.")
         print("AI error:", repr(e))
 
 
