@@ -7,3 +7,4 @@ fastapi
 uvicorn
 pydantic
 flask-cors
+zai-sdk
