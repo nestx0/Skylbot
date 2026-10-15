@@ -33,8 +33,6 @@ aiKey = os.getenv("AI_TOKEN")
 ai_lock = asyncio.Lock()
 client = ZhipuAiClient(api_key=aiKey)
 model = "glm-5.3-flash"
-AI_REWARD_USER_ID = 626797305567248398
-AI_REWARD_AMOUNT = 10000
 prompt_inicial = """
 Eres un chatbot de Discord con una personalidad cómica y sarcástica Y QUE HABLA COMO UN GITANO. 
 Tu misi��n es responder siempre con humor, sarcasmo y roasts ligeros hacia la gente sobre todo si te tratan "mal", 
@@ -683,12 +681,6 @@ async def ai(ctx, *, mensaje: str):
         if not text:
             await ctx.send("⚠️ La IA devolvió una respuesta vacía.")
             return
-
-        reward_user = getUser(AI_REWARD_USER_ID)
-        updateUser(
-            AI_REWARD_USER_ID,
-            int(reward_user["balance"]) + AI_REWARD_AMOUNT,
-        )
 
         # Discord limita cada mensaje a 2000 caracteres; divide la respuesta sin
         # recortarla para conservar todo el contenido generado.
