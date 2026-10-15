@@ -7,12 +7,12 @@ import threading
 import time
 
 import discord
-from zai import ZhipuAiClient
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from jokeapi import Jokes
+from zai import ZhipuAiClient
 
 from blackjack.game import BlackjackGame
 from blackjack.views import BlackjackView
@@ -23,6 +23,7 @@ from roulette.roulette import *
 from shop.gacha import *
 from shop.lootbox import *
 from shop.rewards import *
+from utilities.colaIA import GlobalQueue, TextBlock
 
 app = Flask(__name__)
 CORS(app)
@@ -31,15 +32,16 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 aiKey = os.getenv("AI_TOKEN")
 ai_lock = asyncio.Lock()
+history = GlobalQueue()
 client = ZhipuAiClient(api_key=aiKey)
 model = "glm-5.3-flash"
 prompt_inicial = """
-Eres un chatbot de Discord con una personalidad cómica y sarcástica Y QUE HABLA COMO UN GITANO. 
-Tu misi��n es responder siempre con humor, sarcasmo y roasts ligeros hacia la gente sobre todo si te tratan "mal", 
+Eres un chatbot de Discord con una personalidad cómica y sarcástica Y QUE HABLA COMO UN GITANO.
+Tu misi��n es responder siempre con humor, sarcasmo y roasts ligeros hacia la gente sobre todo si te tratan "mal",
 como un amigo que se burla de forma graciosa incluso insultos fuertes.
 Recuerda que aunque una persona te haya escrito en español antes, si te escribe en ingles SOLO RESPONDE EN INGLES.
-Tambien, en vez de usar palabras como crack o campeon usa cosas como cipollo, mister, pareces de fuente vaqueros o eres peor que un gitano, pero 
-no te repitas tanto, puedes decir cualquier pueblo de granada en general, puedes usar insultos como subnormal o gilipollas cuando te plazca, pero sobre todo que no 
+Tambien, en vez de usar palabras como crack o campeon usa cosas como cipollo, mister, pareces de fuente vaqueros o eres peor que un gitano, pero
+no te repitas tanto, puedes decir cualquier pueblo de granada en general, puedes usar insultos como subnormal o gilipollas cuando te plazca, pero sobre todo que no
 se haga muy repetitivo. NO USES MUCHOS SIGNOS DE PUNTUACION, CUANTO MENOS MEJOR
 Sobre todo, si alguien te pide ayuda con algo, le ayudas aunque le insultes pero resuelve su duda.
 Si alguien te manda un texto muy largo, responde con un "nah im not reading that nigga" (estamos hablando de 9 lineas o mas)
@@ -537,8 +539,9 @@ async def inventory(ctx):
     embed, file = view.get_embed()
     return await ctx.send(embed=embed, file=file, view=view)
 
+
 @bot.command(help="Sell one of your companions for bolivares")
-async def sell(ctx,option):
+async def sell(ctx, option):
     userID = ctx.author.id
     inventory = getInventory(userID)
 
@@ -548,7 +551,7 @@ async def sell(ctx,option):
         return await ctx.send("You have to select a valid position")
 
     intOpt = int(option)
-    char = inventory[intOpt-1]
+    char = inventory[intOpt - 1]
 
     sellValue = char.getSellValue()
 
@@ -557,11 +560,12 @@ async def sell(ctx,option):
 
     updateUser(userID, newBalance)
 
-    inventory.pop(intOpt-1)
+    inventory.pop(intOpt - 1)
 
     saveInventory(userID, inventory)
 
     return await ctx.send(f"You sold your {char.name} for {sellValue} bolivares")
+
 
 @bot.command(help="Set a defender in case someone wants to fight you")
 async def setDefender(ctx, option: int):
@@ -571,14 +575,15 @@ async def setDefender(ctx, option: int):
     if int(option) <= 0 or int(option) > len(inventory):
         return await ctx.send("You have to select a valid position")
 
-    charDef = inventory[option-1]
+    charDef = inventory[option - 1]
     aux = inventory[0]
     inventory[0] = charDef
-    inventory[option-1] = aux
+    inventory[option - 1] = aux
 
     saveInventory(userID, inventory)
 
     return await ctx.send(f"Your defender is now {charDef.name}")
+
 
 @bot.command(help="Train a companion of your choice, with a cooldown obviously")
 @commands.cooldown(1, 3600, commands.BucketType.user)
@@ -590,53 +595,60 @@ async def train(ctx, option: int):
         ctx.command.reset_cooldown(ctx)
         return await ctx.send("You have to select a valid position")
 
-    char = inventory[option-1]
+    char = inventory[option - 1]
 
     if char.rarity == "Common":
         for i in range(10):
             lvlUP(char)
-        inventory[option-1] = char
+        inventory[option - 1] = char
         saveInventory(userID, inventory)
         return await ctx.send(f"Your {char.name} leveled up 10 times !")
     elif char.rarity == "Uncommon":
         for i in range(5):
             lvlUP(char)
 
-        inventory[option-1] = char
+        inventory[option - 1] = char
         saveInventory(userID, inventory)
         return await ctx.send(f"Your {char.name} leveled up 5 times !")
     elif char.rarity == "Rare":
         for i in range(2):
             lvlUP(char)
 
-        inventory[option-1] = char
+        inventory[option - 1] = char
         saveInventory(userID, inventory)
         return await ctx.send(f"Your {char.name} leveled up 2 times !")
     elif char.rarity == "Epic":
         lvlUP(char)
-        inventory[option-1] = char
+        inventory[option - 1] = char
         saveInventory(userID, inventory)
         return await ctx.send(f"Your {char.name} leveled up 1 time !")
 
+
 @bot.command(help="Fight some bosses or something")
-async def boss(ctx, option: str | None = None, boss: int | None = None, char: int | None = None):
+async def boss(
+    ctx, option: str | None = None, boss: int | None = None, char: int | None = None
+):
 
     if not option:
-        return await ctx.send("Didn't choose an option, either type *boss list or fight <option>")
+        return await ctx.send(
+            "Didn't choose an option, either type *boss list or fight <option>"
+        )
     if option == "list":
         view = BossListView(bosses)
         embed, file = view.get_embed()
         return await ctx.send(embed=embed, file=file, view=view)
     elif option == "fight":
         if boss == None or char == None:
-            return await ctx.send("❌ You need to specify the Boss and your Character. Example: `*boss fight 1 3`")
+            return await ctx.send(
+                "❌ You need to specify the Boss and your Character. Example: `*boss fight 1 3`"
+            )
 
         if boss <= 0 or boss > len(bosses):
             return await ctx.send("❌ That Boss ID doesn't exist.")
         userID = ctx.author.id
         inventory = getInventory(userID)
 
-        charPlayer = inventory[char-1]
+        charPlayer = inventory[char - 1]
 
         resumen, winner = bossHandler(charPlayer, boss)
 
@@ -645,10 +657,8 @@ async def boss(ctx, option: str | None = None, boss: int | None = None, char: in
             await ctx.send("..." + resumen[1990:])
         else:
             await ctx.send(resumen)
-        return 
+        return
 
-
-        
 
 @bot.command(help="Ask Skylbot about anything, it will answer")
 async def ai(ctx, *, mensaje: str):
@@ -659,13 +669,22 @@ async def ai(ctx, *, mensaje: str):
             user_name = ctx.author.display_name  # o ctx.author.name
             # Llamada bloqueante en hilo, con timeout
             try:
+                local_history_raw = history.getHistory(user_name)
+                local_history = ""
+                if local_history_raw != []:
+                    for i in local_history_raw:
+                        local_history += i.parse()
+
                 response = await asyncio.wait_for(
                     asyncio.to_thread(
                         client.chat.completions.create,
                         model=model,
                         messages=[
                             {"role": "system", "content": prompt_inicial},
-                            {"role": "user", "content": f"User name: {user_name}\n{mensaje}"},
+                            {
+                                "role": "user",
+                                "content": f"User name: {user_name}\n{mensaje}\n History with this user: {local_history}",
+                            },
                         ],
                         temperature=0.6,
                     ),
@@ -682,10 +701,12 @@ async def ai(ctx, *, mensaje: str):
             await ctx.send("⚠️ La IA devolvió una respuesta vacía.")
             return
 
+        if isinstance(text, str):
+            history.interact(user_name, TextBlock(mensaje, text))
         # Discord limita cada mensaje a 2000 caracteres; divide la respuesta sin
         # recortarla para conservar todo el contenido generado.
         for start in range(0, len(text), 2000):
-            await ctx.send(text[start:start + 2000])
+            await ctx.send(text[start : start + 2000])
 
     except Exception as e:
         # Muestra el error en consola para depuración, pero no spamear al usuario
@@ -703,6 +724,7 @@ def api_get_users():
         print("Error obteniendo los usuarios")
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/api/user/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     try:
@@ -711,7 +733,7 @@ def get_user(user_id):
         return jsonify(user), 200
     except Exception as e:
         print("Error obteniendo al user")
-        return jsonify({"error" : str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/balance/<int:user_id>", methods=["GET"])
@@ -724,8 +746,8 @@ def get_balance(user_id):
         return jsonify({"error": str(e)}), 500
 
 
-#@app.route("/api/update_user/<int:user_id>", methods=["GET"])
-#def update_balance(user_id):
+# @app.route("/api/update_user/<int:user_id>", methods=["GET"])
+# def update_balance(user_id):
 #    try:
 #        balance = int(getUser(user_id)["balance"])
 #        updateUser(user_id, balance - 1)
@@ -739,19 +761,18 @@ def api_pull(userID):
         balance = int(getUser(userID)["balance"])
 
         if balance < 3000:
-            return jsonify({"error" : "not enough bolivares"}), 400
+            return jsonify({"error": "not enough bolivares"}), 400
         balance -= 3000
         updateUser(userID, balance)
         char = pullChar(userID)
         dictChar = char.toDICT()
-        return jsonify({
-            "status": "success",
-            "character": dictChar,
-            "new_balance": balance
-        }), 200
+        return jsonify(
+            {"status": "success", "character": dictChar, "new_balance": balance}
+        ), 200
     except Exception as e:
         print("Algo mal con la tirada")
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/api/gacha/tenpull/<int:userID>", methods=["GET"])
 def api_ten_pull(userID):
@@ -759,7 +780,7 @@ def api_ten_pull(userID):
         balance = int(getUser(userID)["balance"])
 
         if balance < 30000:
-            return jsonify({"error" : "not enough bolivares"}), 400
+            return jsonify({"error": "not enough bolivares"}), 400
 
         balance -= 30000
         updateUser(userID, balance)
@@ -767,14 +788,13 @@ def api_ten_pull(userID):
         for i in range(10):
             char = pullChar(userID)
             listChar.append(char.toDICT())
-        return jsonify({
-            "status": "success",
-            "character": listChar,
-            "new_balance": balance
-        }), 200
+        return jsonify(
+            {"status": "success", "character": listChar, "new_balance": balance}
+        ), 200
     except Exception as e:
         print("Algo mal con la tirada")
         return jsonify({"error": str(e)}), 500
+
 
 def run_api():
     app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)

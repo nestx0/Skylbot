@@ -10,6 +10,9 @@ class TextBlock:
     def getNumCharacters(self) -> int:
         return len(self.question) + len(self.answer)
 
+    def parse(self) -> str:
+        return "Pregunta: " + self.question + "\n" + "Respuesta: " + self.answer + "\n"
+
 
 class IAQueue:
     def __init__(self, max_tam: int = 3, max_chars: int = 5000) -> None:
@@ -34,6 +37,10 @@ class IAQueue:
             self.deque.append(txt)
             self.current_characters += txt.getNumCharacters()
 
+    def getHistory(self) -> list[TextBlock]:
+        with self.lock:
+            return list(self.deque)
+
 
 class GlobalQueue:
     def __init__(self) -> None:
@@ -46,3 +53,11 @@ class GlobalQueue:
                 self.queue_map[user] = IAQueue()
 
         self.queue_map[user].addMessage(txt)
+
+    def getHistory(self, user: str):
+        with self.global_lock:
+            if user not in self.queue_map:
+                return []
+            user_queue = self.queue_map[user]
+
+        return user_queue.getHistory()
