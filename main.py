@@ -660,56 +660,64 @@ async def boss(
         return
 
 
+@bot.command(help="Make Skylbot forget what you told it")
+async def clear(ctx):
+    user_name = ctx.author.display_name
+    history.clear(user_name)
+    await ctx.send("All done !")
+
+
 @bot.command(help="Ask Skylbot about anything, it will answer")
 async def ai(ctx, *, mensaje: str):
     try:
         await ctx.typing()
-        # Serializamos acceso por si el SDK/objeto no es thread-safe
-        async with ai_lock:
-            user_name = ctx.author.display_name  # o ctx.author.name
-            # Llamada bloqueante en hilo, con timeout
-            try:
-                local_history_raw = history.getHistory(user_name)
-                local_history = ""
-                if local_history_raw != []:
-                    for i in local_history_raw:
-                        local_history += i.parse()
+        user_name = ctx.author.display_name
 
-                response = await asyncio.wait_for(
-                    asyncio.to_thread(
-                        client.chat.completions.create,
-                        model=model,
-                        messages=[
-                            {"role": "system", "content": prompt_inicial},
-                            {
-                                "role": "user",
-                                "content": f"User name: {user_name}\n{mensaje}\n History with this user: {local_history}",
-                            },
-                        ],
-                        temperature=0.6,
-                    ),
-                    timeout=30.0,
-                )
-            except asyncio.TimeoutError:
-                # Si la IA tarda demasiado, salimos del lock para que otras peticiones no se queden bloqueadas
-                await ctx.send("⏳ La IA tardó demasiado. Intenta de nuevo más tarde.")
-                return
+        # 1. Obtener historial (operación en memoria rápida, segura por sus propios cerrojos)
+        local_history_raw = history.getHistory(user_name)
 
-        # Enviamos solo UNA vez la respuesta (fuera del lock)
+        # 2. Construir la lista de mensajes de forma nativa para la API
+        messages_payload = [{"role": "system", "content": prompt_inicial}]
+
+        if local_history_raw:
+            for block in local_history_raw:
+                messages_payload.append({"role": "user", "content": block.question})
+                messages_payload.append({"role": "assistant", "content": block.answer})
+
+        # 3. Añadir el mensaje actual
+        messages_payload.append(
+            {"role": "user", "content": f"User name: {user_name}\n{mensaje}"}
+        )
+
+        # 4. Llamada a la API SIN el ai_lock global para permitir peticiones concurrentes
+        try:
+            response = await asyncio.wait_for(
+                asyncio.to_thread(
+                    client.chat.completions.create,
+                    model=model,
+                    messages=messages_payload,
+                    temperature=0.6,
+                ),
+                timeout=30.0,
+            )
+        except asyncio.TimeoutError:
+            await ctx.send("⏳ La IA tardó demasiado. Intenta de nuevo más tarde.")
+            return
+
         text = response.choices[0].message.content
         if not text:
             await ctx.send("⚠️ La IA devolvió una respuesta vacía.")
             return
 
+        # 5. Guardar en el historial
         if isinstance(text, str):
             history.interact(user_name, TextBlock(mensaje, text))
-        # Discord limita cada mensaje a 2000 caracteres; divide la respuesta sin
-        # recortarla para conservar todo el contenido generado.
+
+        # 6. Enviar a Discord manejando el límite de 2000 caracteres
         for start in range(0, len(text), 2000):
             await ctx.send(text[start : start + 2000])
 
     except Exception as e:
-        # Muestra el error en consola para depuración, pero no spamear al usuario
         await ctx.send("⚠️ Error al conectar con GLM.")
         print("AI error:", repr(e))
 

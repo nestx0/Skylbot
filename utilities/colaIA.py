@@ -41,6 +41,10 @@ class IAQueue:
         with self.lock:
             return list(self.deque)
 
+    def clear(self) -> None:
+        with self.lock:
+            self.deque = deque()
+
 
 class GlobalQueue:
     def __init__(self) -> None:
@@ -61,3 +65,8 @@ class GlobalQueue:
             user_queue = self.queue_map[user]
 
         return user_queue.getHistory()
+
+    def clear(self, user: str):
+        with self.global_lock:
+            if user in self.queue_map:
+                self.queue_map[user].clear()
