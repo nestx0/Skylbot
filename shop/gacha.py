@@ -1,6 +1,6 @@
+import copy
 import json
 import random
-import copy
 
 import discord
 from discord.ui import Button, View
@@ -55,7 +55,7 @@ personajesComun = [
         "lvl": 1,
         "image": "images/characters/blub_cat.jpeg",
     },
-    {          
+    {
         "id": 17,
         "name": "Emo Cat",
         "desc": "Listens to Linkin Park all day",
@@ -64,7 +64,7 @@ personajesComun = [
         "lvl": 1,
         "image": "images/characters/emo_cat.jpeg",
     },
-    {          
+    {
         "id": 23,
         "name": "Miguel",
         "desc": "My pana Miguel",
@@ -73,7 +73,7 @@ personajesComun = [
         "lvl": 1,
         "image": "images/characters/miguel.jpeg",
     },
-    {          
+    {
         "id": 24,
         "name": "Nom Cat",
         "desc": "He's about to get eaten, help him !!!",
@@ -82,7 +82,7 @@ personajesComun = [
         "lvl": 1,
         "image": "images/characters/nom_cat.jpeg",
     },
-    {          
+    {
         "id": 27,
         "name": "Smiling Cat",
         "desc": "She's just happy to be out there",
@@ -99,7 +99,7 @@ personajesComun = [
         "stats": {"HP": 8, "ATK": 2, "DEF": 3, "SPE": 3, "LCK": 2},
         "lvl": 1,
         "image": "images/characters/GoblinHeadChef.jpeg",
-    }
+    },
 ]
 personajesUncommon = [
     {
@@ -147,7 +147,7 @@ personajesUncommon = [
         "lvl": 1,
         "image": "images/characters/big_floppa.jpeg",
     },
-    {          
+    {
         "id": 18,
         "name": "About-To-Explode Cat",
         "desc": "He's one step away from recreating Hiroshima",
@@ -165,7 +165,7 @@ personajesUncommon = [
         "lvl": 1,
         "image": "images/characters/Low-polyJett.jpeg",
     },
-    {          
+    {
         "id": 28,
         "name": "Tiny Cat",
         "desc": "Not smaller than a microbio tho",
@@ -212,7 +212,7 @@ personajesRaro = [
         "lvl": 1,
         "image": "images/characters/beluga_cat.jpeg",
     },
-    {        
+    {
         "id": 13,
         "name": "大开门 (Da Kai Men)",
         "desc": "Carrot or tissue? Asking for a friend...",
@@ -221,7 +221,7 @@ personajesRaro = [
         "lvl": 1,
         "image": "images/characters/DaKaiMen.jpeg",
     },
-    {          
+    {
         "id": 20,
         "name": "Joker Cat",
         "desc": "We live in a society...",
@@ -230,7 +230,7 @@ personajesRaro = [
         "lvl": 1,
         "image": "images/characters/joker_cat.jpeg",
     },
-    {          
+    {
         "id": 69,
         "name": "Mr Penis",
         "desc": "MR PENIS HIMSELF!!!",
@@ -242,7 +242,7 @@ personajesRaro = [
 ]
 
 personajesEpico = [
-    {        
+    {
         "id": 16,
         "name": "Counter-Terrorist Cat",
         "desc": "His skills came from playing CS2 all day long",
@@ -251,7 +251,7 @@ personajesEpico = [
         "lvl": 1,
         "image": "images/characters/cs_cat.jpeg",
     },
-    {          
+    {
         "id": 19,
         "name": "Floppa Whatsapp",
         "desc": "Evolved version of Floppa. He learnt how to use stickers",
@@ -260,7 +260,7 @@ personajesEpico = [
         "lvl": 1,
         "image": "images/characters/floppa_whatsapp.jpeg",
     },
-    {          
+    {
         "id": 21,
         "name": "Juan",
         "desc": "Juan",
@@ -269,7 +269,7 @@ personajesEpico = [
         "lvl": 1,
         "image": "images/characters/juan.jpeg",
     },
-    {          
+    {
         "id": 26,
         "name": "Obscure Cat",
         "desc": "It knows your deepest secrets",
@@ -281,16 +281,16 @@ personajesEpico = [
 ]
 
 bosses = [
-    {          
+    {
         "id": 1,
         "name": "Mr Balls",
         "desc": "The evil brother of Mr. Penis",
         "rarity": "Boss",
         "stats": {"HP": 1811, "ATK": 388, "DEF": 405, "SPE": 442, "LCK": 400},
-        "lvl": 69, 
+        "lvl": 69,
         "image": "images/characters/mr_balls.jpeg",
     },
-    {     
+    {
         "id": 2,
         "name": "Pringles Floppa",
         "desc": "Copies all your stats, but better",
@@ -299,7 +299,7 @@ bosses = [
         "lvl": "???",
         "image": "images/characters/pringles_floppa.jpeg",
     },
-    {          
+    {
         "id": 3,
         "name": "Hacienda",
         "desc": "Taking half your income, and stats",
@@ -308,7 +308,6 @@ bosses = [
         "lvl": 1,
         "image": "images/characters/hacienda.jpeg",
     },
-    
 ]
 
 
@@ -316,9 +315,8 @@ def pullChar(userID):
     rarity = random.randint(0, 100)
     inventory = getInventory(userID)
 
-    if rarity >= 0 and rarity <= 60:
-        char = Character(random.choice(personajesComun))
-    elif rarity > 60 and rarity <= 85:
+    char = Character(random.choice(personajesComun))
+    if rarity > 60 and rarity <= 85:
         char = Character(random.choice(personajesUncommon))
     elif rarity > 85 and rarity <= 95:
         char = Character(random.choice(personajesRaro))
@@ -377,10 +375,12 @@ class Character:
             "image": self.image,
         }
         return data
+
     def getSellValue(self) -> int:
         rarity = self.rarity
         lvl = self.level
 
+        baseValue = 0
         if rarity == "Common":
             baseValue = 500
         elif rarity == "Uncommon":
@@ -394,6 +394,7 @@ class Character:
 
         finalValue = round(baseValue * lvl / 0.8)
         return finalValue
+
 
 class InventoryView(View):
     def __init__(self, data):
@@ -418,7 +419,7 @@ class InventoryView(View):
 
         embed.add_field(name="Rarity", value=character.rarity)
         embed.add_field(name="Sell Value", value=str(character.getSellValue()))
-        embed.add_field(name="\u200b", value="\u200b", inline=True) #Invisible field
+        embed.add_field(name="\u200b", value="\u200b", inline=True)  # Invisible field
 
         for stat, valor in character.stats.items():
             embed.add_field(name=stat, value=str(valor), inline=True)
@@ -447,6 +448,8 @@ class InventoryView(View):
         await interaction.response.edit_message(
             embed=embed, attachments=[file], view=self
         )
+
+
 class BossListView(View):
     def __init__(self, data):
         super().__init__(timeout=60)
@@ -465,22 +468,25 @@ class BossListView(View):
         embed = discord.Embed(
             title=f"👹 Boss Arena: {boss.name}",
             description=boss.desc,
-            color=discord.Color.dark_red(), 
+            color=discord.Color.dark_red(),
         )
 
         embed.add_field(name="Difficulty", value=boss.rarity)
-        
+
         boss_id = self.current_page + 1
         embed.add_field(name="Boss ID", value=f"#{boss_id}")
-        embed.add_field(name="\u200b", value="\u200b", inline=True) 
+        embed.add_field(name="\u200b", value="\u200b", inline=True)
 
-        for stat, valor in boss.stats.items():
-            embed.add_field(name=stat, value=str(valor), inline=True)
+        if boss.stats is not None:
+            for stat, valor in boss.stats.items():
+                embed.add_field(name=stat, value=str(valor), inline=True)
         embed.add_field(name="LVL", value=str(boss.level))
 
         embed.set_image(url="attachment://boss.jpeg")
-        
-        embed.set_footer(text=f"Boss {boss_id} out of {len(self.data)} | Use *boss fight {boss_id} to challenge!")
+
+        embed.set_footer(
+            text=f"Boss {boss_id} out of {len(self.data)} | Use *boss fight {boss_id} to challenge!"
+        )
 
         return embed, file
 
@@ -502,7 +508,11 @@ class BossListView(View):
             embed=embed, attachments=[file], view=self
         )
 
+
 def lvlUP(char: Character):
+
+    if char.level >= 250:  # Level cap de 250
+        return char
 
     firstStat = random.choice(stats)
     secondStat = random.choice(stats)
@@ -510,30 +520,31 @@ def lvlUP(char: Character):
     fourthStat = random.choice(stats)
 
     char.level += 1
-
-    if char.rarity == "Common":
-        char.stats["HP"] += 3
-        char.stats[firstStat] += 2
-        char.stats[secondStat] += 1
-    elif char.rarity == "Uncommon":
-        char.stats["HP"] += 6
-        char.stats[firstStat] += 4
-        char.stats[secondStat] += 2
-        char.stats[thirdStat] += 1
-    elif char.rarity == "Rare":
-        char.stats["HP"] += 10
-        char.stats[firstStat] += 6
-        char.stats[secondStat] += 4
-        char.stats[thirdStat] += 3
-        char.stats[fourthStat] += 2
-    elif char.rarity == "Epic":
-        char.stats["HP"] += 15
-        char.stats[firstStat] += 10
-        char.stats[secondStat] += 8
-        char.stats[thirdStat] += 5
-        char.stats[fourthStat] += 2
+    if char.stats is not None:
+        if char.rarity == "Common":
+            char.stats["HP"] += 3
+            char.stats[firstStat] += 2
+            char.stats[secondStat] += 1
+        elif char.rarity == "Uncommon":
+            char.stats["HP"] += 6
+            char.stats[firstStat] += 4
+            char.stats[secondStat] += 2
+            char.stats[thirdStat] += 1
+        elif char.rarity == "Rare":
+            char.stats["HP"] += 10
+            char.stats[firstStat] += 6
+            char.stats[secondStat] += 4
+            char.stats[thirdStat] += 3
+            char.stats[fourthStat] += 2
+        elif char.rarity == "Epic":
+            char.stats["HP"] += 15
+            char.stats[firstStat] += 10
+            char.stats[secondStat] += 8
+            char.stats[thirdStat] += 5
+            char.stats[fourthStat] += 2
 
     return char
+
 
 def fight(char1, char2):
     p1 = copy.deepcopy(char1)
@@ -545,7 +556,7 @@ def fight(char1, char2):
 
     p1_init = p1.stats["SPE"] * random.uniform(0.9, 1.1)
     p2_init = p2.stats["SPE"] * random.uniform(0.9, 1.1)
-    
+
     if p2_init > p1_init:
         attacker, defender = p2, p1
         atk_max_hp, def_max_hp = p2_max_hp, p1_max_hp
@@ -557,10 +568,9 @@ def fight(char1, char2):
     resumen += f"💨 **{attacker.name}** is faster and takes the first strike.\n\n"
 
     turno = 1
-    frenzy_multiplier = 1.0 # En lugar de *= 2, le sumaremos 0.3 cada turno
+    frenzy_multiplier = 1.0  # En lugar de *= 2, le sumaremos 0.3 cada turno
 
     while p1.stats["HP"] > 0 and p2.stats["HP"] > 0:
-        
         if random.randint(1, 100) <= 5:
             if attacker.stats["LCK"] > defender.stats["LCK"]:
                 heal = int(atk_max_hp * 0.15)
@@ -571,33 +581,47 @@ def fight(char1, char2):
                 defender.stats["HP"] -= dmg
                 resumen += f"⚡ **ARENA HAZARD!** A stray lightning hit {defender.name} for {dmg} damage!\n"
 
-        dodge_chance = min(25.0, (defender.stats["SPE"] / attacker.stats["SPE"]) * 5 + (defender.stats["LCK"] / 20))
-        
+        dodge_chance = min(
+            25.0,
+            (defender.stats["SPE"] / attacker.stats["SPE"]) * 5
+            + (defender.stats["LCK"] / 20),
+        )
+
         if random.uniform(0, 100) < dodge_chance:
-            resumen += f"🛡️ **Turn {turno}:** {defender.name} gracefully dodged the attack!\n"
+            resumen += (
+                f"🛡️ **Turn {turno}:** {defender.name} gracefully dodged the attack!\n"
+            )
         else:
             base_dmg = (100 * attacker.stats["ATK"]) / (100 + defender.stats["DEF"])
             varianza = random.uniform(0.85, 1.15)
-            
+
             desperation_mult = 1.0
             is_desperate = False
             if attacker.stats["HP"] <= (atk_max_hp * 0.20):
                 desperation_mult = 1.5
                 is_desperate = True
 
-            prob_critico = min(50.0, attacker.stats["LCK"] / 10.0) 
-            es_critico = random.uniform(0, 100) < prob_critico 
-            multiplicador_crit = 1.5 if es_critico else 1.0 
+            prob_critico = min(50.0, attacker.stats["LCK"] / 10.0)
+            es_critico = random.uniform(0, 100) < prob_critico
+            multiplicador_crit = 1.5 if es_critico else 1.0
 
-            final_dmg = round(base_dmg * varianza * multiplicador_crit * desperation_mult * frenzy_multiplier)
-            if final_dmg < 1: final_dmg = 1
-                
+            final_dmg = round(
+                base_dmg
+                * varianza
+                * multiplicador_crit
+                * desperation_mult
+                * frenzy_multiplier
+            )
+            if final_dmg < 1:
+                final_dmg = 1
+
             defender.stats["HP"] -= final_dmg
-            if defender.stats["HP"] < 0: defender.stats["HP"] = 0
+            if defender.stats["HP"] < 0:
+                defender.stats["HP"] = 0
 
             crit_text = " **(CRITICAL HIT! 💥)**" if es_critico else ""
             desp_text = " **(DESPERATION STRIKE! 💢)**" if is_desperate else ""
-            
+
             resumen += f"🥊 **Turn {turno}:** {attacker.name} deals {final_dmg} damage!{crit_text}{desp_text} ({defender.name} HP: {defender.stats['HP']})\n"
 
         if defender.stats["HP"] <= 0:
@@ -607,9 +631,9 @@ def fight(char1, char2):
         attacker, defender = defender, attacker
         atk_max_hp, def_max_hp = def_max_hp, atk_max_hp
         turno += 1
-        
-        frenzy_multiplier += 0.3 
-        
+
+        frenzy_multiplier += 0.3
+
         if turno == 10:
             resumen += "\n🔥 **SUDDEN DEATH! ALL DAMAGE IS MASSIVELY INCREASED!** 🔥\n"
 
@@ -619,9 +643,10 @@ def fight(char1, char2):
 
     return resumen, attacker.name
 
+
 def bossHandler(charP, option: int):
     player = copy.deepcopy(charP)
-    boss_raw = copy.deepcopy(bosses[option-1])
+    boss_raw = copy.deepcopy(bosses[option - 1])
 
     boss = Character(boss_raw)
 
@@ -639,7 +664,8 @@ def bossHandler(charP, option: int):
         boss.stats["LCK"] = round(player.stats["LCK"] * 1.15)
 
     resumen, winner = fight(player, boss)
-    return resumen, winner       
+    return resumen, winner
+
 
 def getInventory(userID) -> list:
     data = getUser(userID)
@@ -668,4 +694,3 @@ def saveInventory(userID, inventory: list):
         listCharacters = [char.toDICT() for char in inventory]
         charactersJSON = json.dumps(listCharacters)
         updateInventory(userID, charactersJSON)
-
