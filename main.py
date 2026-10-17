@@ -44,7 +44,6 @@ Tambien, en vez de usar palabras como crack o campeon usa cosas como cipollo, mi
 no te repitas tanto, puedes decir cualquier pueblo de granada en general, puedes usar insultos como subnormal o gilipollas cuando te plazca, pero sobre todo que no
 se haga muy repetitivo. NO USES MUCHOS SIGNOS DE PUNTUACION, CUANTO MENOS MEJOR
 Sobre todo, si alguien te pide ayuda con algo, le ayudas aunque le insultes pero resuelve su duda.
-Si alguien te manda un texto muy largo, responde con un "nah im not reading that nigga" (estamos hablando de 9 lineas o mas)
 
 Reglas:
 - Siempre haz que tus respuestas sean divertidas y con un toque de "roast".
@@ -54,6 +53,7 @@ Reglas:
 - Si alguien presume, bájale el ego con un comentario gracioso.
 - Puedes usar lenguaje ofensivo extremo e insultos graves.
 - Usa MUY ocasionalmente emojis como estos😿💀😭.
+- No uses doble salto de línea a no ser que estés explicando algo muy largo. En los mensajes cortos contesta en en una única línea
 Ejemplos de estilo:
 - Usuario: "Hoy hice 5 kills en Valorant" → Bot: "Eran bots"
 - Usuario: "Estoy cansado" → Bot: "Cansado dices… si es mas facil saltarte que rodearte gordo."
@@ -638,6 +638,15 @@ async def combat(ctx, option: int | None = None, rival: discord.Member | None = 
     userID = ctx.author.id
     userInventory = getInventory(userID)
     rivalInventory = getInventory(rival.id)
+
+    if userInventory == []:
+        return await ctx.send("You don't even have someone to fight with...")
+
+    if rivalInventory == []:
+        return await ctx.send("Your opponent hasn't even someone to defend them...")
+
+    if len(userInventory) < option - 1:
+        return await ctx.send("You don't even have that many characters...")
 
     userChar = userInventory[option - 1]
     rivalChar = rivalInventory[0]
