@@ -624,6 +624,33 @@ async def train(ctx, option: int):
         return await ctx.send(f"Your {char.name} leveled up 1 time !")
 
 
+@bot.command(help="Fight your friend's defender")  # En el futuro meterle apuestas
+async def combat(ctx, option: int | None = None, rival: discord.Member | None = None):
+    if not option:
+        return await ctx.send(
+            "You have to choose who you are using in your fight, type *fight <fighter (inventory position)> <rival>"
+        )
+    if not rival:
+        return await ctx.send(
+            "No rival chosen, type *fight <fighter (inventory position)> <rival>"
+        )
+
+    userID = ctx.author.id
+    userInventory = getInventory(userID)
+    rivalInventory = getInventory(rival.id)
+
+    userChar = userInventory[option - 1]
+    rivalChar = rivalInventory[0]
+
+    resumen, winner = fight(userChar, rivalChar)
+    if len(resumen) > 1990:
+        await ctx.send(resumen[:1990] + "...")
+        await ctx.send("..." + resumen[1990:])
+    else:
+        await ctx.send(resumen)
+    return
+
+
 @bot.command(help="Fight some bosses or something")
 async def boss(
     ctx, option: str | None = None, boss: int | None = None, char: int | None = None
