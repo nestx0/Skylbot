@@ -344,6 +344,7 @@ async def roulette(ctx, amount=None, choice=None, *, numbers: str | None = None)
             win = getWin(result, choice)
 
             mult = getMultiplier(win, choice)
+            assert mult is not None
             amount = int(amount * mult)
             updateUser(ctx.author.id, newBalance + amount)
             if "red" in numbas[str(result)]:
@@ -496,31 +497,63 @@ async def buyRole(ctx):
     else:
         updateUser(userID, balance - 200000)
         await ctx.send("Purchasing secret role...")
+        assert miembro is not None
         await miembro.add_roles(rol)
         print("Success with assinging role")
         return
 
 
 @bot.command(help="Get one of many characters to sell or fight with them")
-async def pull(ctx):
+async def pull(ctx, quantity: int | None = None):
     userID = ctx.author.id
     balance = int(getUser(userID)["balance"])
+    PULL_PRICE = 3000
+    char = None
 
-    if balance < 3000:
+    if balance < PULL_PRICE:
         return await ctx.send("To pull a character, you need 3000 bolivares")
 
     print(f"Haciendo pull para {ctx.author.display_name}...")
+    if quantity == None:
+        balance -= PULL_PRICE
+        updateUser(userID, balance)
 
-    balance -= 3000
-    updateUser(userID, balance)
+        char = pullChar(userID)
+        if char.level > 1:
+            mensaje = f"♻️ **Repeated!** You already had a **{char.name}**. It leveled up to **{char.level}**! ⬆️"
+        else:
+            mensaje = (
+                f"✨ **Congrats!** You got a new **{char.name}** ({char.rarity}) 🙀"
+            )
 
-    char = pullChar(userID)
-    if char.level > 1:
-        mensaje = f"♻️ **Repeated!** You already had a **{char.name}**. It leveled up to **{char.level}**! ⬆️"
+        await ctx.send(mensaje)
+
+    elif quantity > 1:
+        if balance < PULL_PRICE * quantity:
+            return await ctx.send(
+                f"You need {PULL_PRICE * quantity} bolivares to pull {quantity} characters"
+            )
+
+        balance -= PULL_PRICE * quantity
+        updateUser(userID, balance)
+
+        nuevos = "NEW: "
+        repes = "Reapeted"
+
+        for i in range(quantity):
+            char = pullChar(userID)
+            if char.level > 1:
+                repes += char.name + f" ({char.rarity}) "
+            else:
+                nuevos += char.name + f" ({char.rarity}) "
+
+        final_mensaje = f"You got the following characters: \n {nuevos} \n {repes}"
+        await ctx.send(final_mensaje)
+
     else:
-        mensaje = f"✨ **Congrats!** You got a new **{char.name}** ({char.rarity}) 🙀"
+        return await ctx.send("Quantity must be at least 1.")
 
-    await ctx.send(mensaje)
+    assert char is not None
     embed = char.toEmbed()
     archivo = discord.File(char.image, filename="char.jpeg")
 
@@ -568,7 +601,13 @@ async def sell(ctx, option):
 
 
 @bot.command(help="Set a defender in case someone wants to fight you")
-async def setDefender(ctx, option: int):
+async def setDefender(ctx, option: int | None = None):
+
+    if option == None:
+        return await ctx.send(
+            "If you wanna set a defender up you have to type *setDefender <position in your inventory>"
+        )
+
     userID = ctx.author.id
     inventory = getInventory(userID)
 
@@ -587,9 +626,21 @@ async def setDefender(ctx, option: int):
 
 @bot.command(help="Train a companion of your choice, with a cooldown obviously")
 @commands.cooldown(1, 3600, commands.BucketType.user)
-async def train(ctx, option: int):
+async def train(ctx, option: int | None = None):
     userID = ctx.author.id
     inventory = getInventory(userID)
+
+    RANGOS_ENTRENAMIENTO = {
+        "Common": (7, 13),
+        "Uncommon": (3, 7),
+        "Rare": (1, 3),
+        "Epic": (0, 2),
+    }
+
+    if option == None:
+        return await ctx.send(
+            "Run the command like this: *train <postion in your inventory>"
+        )
 
     if int(option) <= 0 or int(option) > len(inventory):
         ctx.command.reset_cooldown(ctx)
@@ -597,31 +648,25 @@ async def train(ctx, option: int):
 
     char = inventory[option - 1]
 
-    if char.rarity == "Common":
-        for i in range(10):
-            lvlUP(char)
-        inventory[option - 1] = char
-        saveInventory(userID, inventory)
-        return await ctx.send(f"Your {char.name} leveled up 10 times !")
-    elif char.rarity == "Uncommon":
-        for i in range(5):
-            lvlUP(char)
+    if char.rarity not in RANGOS_ENTRENAMIENTO:
+        ctx.command.reset_cooldown(ctx)
+        return await ctx.send(
+            f"Characters of rarity **{char.rarity}** cannot be trained."
+        )
 
-        inventory[option - 1] = char
-        saveInventory(userID, inventory)
-        return await ctx.send(f"Your {char.name} leveled up 5 times !")
-    elif char.rarity == "Rare":
-        for i in range(2):
-            lvlUP(char)
+    min_lvl, max_lvl = RANGOS_ENTRENAMIENTO[char.rarity]
+    levels_gained = random.randint(min_lvl, max_lvl)
 
-        inventory[option - 1] = char
-        saveInventory(userID, inventory)
-        return await ctx.send(f"Your {char.name} leveled up 2 times !")
-    elif char.rarity == "Epic":
+    for _ in range(levels_gained):
         lvlUP(char)
-        inventory[option - 1] = char
-        saveInventory(userID, inventory)
-        return await ctx.send(f"Your {char.name} leveled up 1 time !")
+
+    inventory[option - 1] = char
+    saveInventory(userID, inventory)
+
+    palabra_veces = "time" if levels_gained == 1 else "times"
+    return await ctx.send(
+        f"Your **{char.name}** leveled up {levels_gained} {palabra_veces}!"
+    )
 
 
 @bot.command(help="Fight your friend's defender")  # En el futuro meterle apuestas

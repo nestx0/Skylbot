@@ -1,0 +1,38 @@
+personajesEpico = [
+    {
+        "id": 16,
+        "name": "Counter-Terrorist Cat",
+        "desc": "His skills came from playing CS2 all day long",
+        "rarity": "Epic",
+        "stats": {"HP": 35, "ATK": 10, "DEF": 15, "SPE": 8, "LCK": 10},
+        "lvl": 1,
+        "image": "images/characters/cs_cat.jpeg",
+    },
+    {
+        "id": 19,
+        "name": "Floppa Whatsapp",
+        "desc": "Evolved version of Floppa. He learnt how to use stickers",
+        "rarity": "Epic",
+        "stats": {"HP": 35, "ATK": 15, "DEF": 8, "SPE": 15, "LCK": 4},
+        "lvl": 1,
+        "image": "images/characters/floppa_whatsapp.jpeg",
+    },
+    {
+        "id": 21,
+        "name": "Juan",
+        "desc": "Juan",
+        "rarity": "Epic",
+        "stats": {"HP": 38, "ATK": 7, "DEF": 22, "SPE": 10, "LCK": 1},
+        "lvl": 1,
+        "image": "images/characters/juan.jpeg",
+    },
+    {
+        "id": 26,
+        "name": "Obscure Cat",
+        "desc": "It knows your deepest secrets",
+        "rarity": "Epic",
+        "stats": {"HP": 35, "ATK": 24, "DEF": 10, "SPE": 10, "LCK": 2},
+        "lvl": 1,
+        "image": "images/characters/obscure_cat.jpeg",
+    },
+]
