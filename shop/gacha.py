@@ -3,14 +3,15 @@ import json
 import random
 
 import discord
-from bosses import bosses
 from discord.ui import Button, View
-from personajesComun import personajesComun
-from personajesEpic import personajesEpico
-from personajesRaro import personajesRaro
-from personajesUncommon import personajesUncommon
 
 from dataBase import *
+
+from .bosses import bosses
+from .personajesComun import personajesComun
+from .personajesEpic import personajesEpico
+from .personajesRaro import personajesRaro
+from .personajesUncommon import personajesUncommon
 
 stats = ["ATK", "DEF", "SPE", "LCK", "HP"]
 
