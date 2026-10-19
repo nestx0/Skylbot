@@ -24,6 +24,7 @@ from shop.gacha import *
 from shop.lootbox import *
 from shop.rewards import *
 from utilities.colaIA import GlobalQueue, TextBlock
+from ai.ai_funcions import prompt_inicial
 
 app = Flask(__name__)
 CORS(app)
