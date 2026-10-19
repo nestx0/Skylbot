@@ -1,3 +1,8 @@
+import copy
+
+from shop.fights import fight
+from shop.gacha import Character
+
 bosses = [
     {
         "id": 1,
@@ -27,3 +32,27 @@ bosses = [
         "image": "images/characters/hacienda.webp",
     },
 ]
+
+
+def bossHandler(charP, option: int):
+    player = copy.deepcopy(charP)
+    boss_raw = copy.deepcopy(bosses[option - 1])
+
+    boss = Character(boss_raw)
+
+    if boss.name == "Hacienda":
+        player.stats["HP"] /= 2
+        player.stats["ATK"] /= 2
+        player.stats["DEF"] /= 2
+        player.stats["SPE"] /= 2
+        player.stats["LCK"] /= 2
+    if boss.name == "Pringles Floppa":
+        assert boss.stats is not None
+        boss.stats["HP"] = round(player.stats["HP"] * 1.15)
+        boss.stats["ATK"] = round(player.stats["ATK"] * 1.15)
+        boss.stats["DEF"] = round(player.stats["DEF"] * 1.15)
+        boss.stats["SPE"] = round(player.stats["SPE"] * 1.15)
+        boss.stats["LCK"] = round(player.stats["LCK"] * 1.15)
+
+    resumen, winner = fight(player, boss)
+    return resumen, winner

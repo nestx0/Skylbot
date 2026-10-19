@@ -21,9 +21,12 @@ from dataBase import *
 from ppt.ppt_game import PPTGame
 from ppt.ppt_view import PPTView
 from roulette.roulette import *
+from shop.bosses import bosses, bossHandler
+from shop.fights import fight
 from shop.gacha import *
 from shop.lootbox import *
 from shop.rewards import *
+from shop.views import BossListView, InventoryView
 from utilities.colaIA import GlobalQueue, TextBlock
 
 app = Flask(__name__)
