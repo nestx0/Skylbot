@@ -53,7 +53,9 @@ class Character:
         self.rarity = info.get("rarity", "Unknown")
         self.level = info.get("lvl", 0)
         self.stats = info.get("stats", None)
-        self.image = info.get("image", "images/characters/maxwell_cat.webp")
+        imagen_guardada = info.get("image", "images/characters/maxwell_cat.webp")
+        self.image = imagen_guardada.replace(".jpeg", ".webp").replace(".png", ".webp").replace(".jpg", ".webp")
+
         if self.rarity == "Common":
             self.color = discord.Color.dark_gray()
         elif self.rarity == "Uncommon":
