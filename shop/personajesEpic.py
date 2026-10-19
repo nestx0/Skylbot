@@ -6,7 +6,7 @@ personajesEpico = [
         "rarity": "Epic",
         "stats": {"HP": 35, "ATK": 10, "DEF": 15, "SPE": 8, "LCK": 10},
         "lvl": 1,
-        "image": "images/characters/cs_cat.jpeg",
+        "image": "images/characters/cs_cat.webp",
     },
     {
         "id": 19,
@@ -15,7 +15,7 @@ personajesEpico = [
         "rarity": "Epic",
         "stats": {"HP": 35, "ATK": 15, "DEF": 8, "SPE": 15, "LCK": 4},
         "lvl": 1,
-        "image": "images/characters/floppa_whatsapp.jpeg",
+        "image": "images/characters/floppa_whatsapp.webp",
     },
     {
         "id": 21,
@@ -24,7 +24,7 @@ personajesEpico = [
         "rarity": "Epic",
         "stats": {"HP": 38, "ATK": 7, "DEF": 22, "SPE": 10, "LCK": 1},
         "lvl": 1,
-        "image": "images/characters/juan.jpeg",
+        "image": "images/characters/juan.webp",
     },
     {
         "id": 26,
@@ -33,6 +33,6 @@ personajesEpico = [
         "rarity": "Epic",
         "stats": {"HP": 35, "ATK": 24, "DEF": 10, "SPE": 10, "LCK": 2},
         "lvl": 1,
-        "image": "images/characters/obscure_cat.jpeg",
+        "image": "images/characters/obscure_cat.webp",
     },
 ]

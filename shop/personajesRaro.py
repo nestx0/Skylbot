@@ -6,7 +6,7 @@ personajesRaro = [
         "rarity": "Rare",
         "stats": {"HP": 20, "ATK": 10, "DEF": 6, "SPE": 7, "LCK": 3},
         "lvl": 1,
-        "image": "images/characters/sus_cat.jpeg",
+        "image": "images/characters/sus_cat.webp",
     },
     {
         "id": 10,
@@ -15,7 +15,7 @@ personajesRaro = [
         "rarity": "Rare",
         "stats": {"HP": 22, "ATK": 7, "DEF": 7, "SPE": 7, "LCK": 4},
         "lvl": 1,
-        "image": "images/characters/surprised_cat.jpeg",
+        "image": "images/characters/surprised_cat.webp",
     },
     {
         "id": 11,
@@ -24,7 +24,7 @@ personajesRaro = [
         "rarity": "Rare",
         "stats": {"HP": 24, "ATK": 7, "DEF": 12, "SPE": 5, "LCK": 3},
         "lvl": 1,
-        "image": "images/characters/micro_cat.jpeg",
+        "image": "images/characters/micro_cat.webp",
     },
     {
         "id": 12,
@@ -33,7 +33,7 @@ personajesRaro = [
         "rarity": "Rare",
         "stats": {"HP": 22, "ATK": 5, "DEF": 6, "SPE": 4, "LCK": 11},
         "lvl": 1,
-        "image": "images/characters/beluga_cat.jpeg",
+        "image": "images/characters/beluga_cat.webp",
     },
     {
         "id": 13,
@@ -42,7 +42,7 @@ personajesRaro = [
         "rarity": "Rare",
         "stats": {"HP": 23, "ATK": 2, "DEF": 3, "SPE": 8, "LCK": 12},
         "lvl": 1,
-        "image": "images/characters/DaKaiMen.jpeg",
+        "image": "images/characters/DaKaiMen.webp",
     },
     {
         "id": 20,
@@ -51,7 +51,7 @@ personajesRaro = [
         "rarity": "Rare",
         "stats": {"HP": 20, "ATK": 5, "DEF": 4, "SPE": 8, "LCK": 8},
         "lvl": 1,
-        "image": "images/characters/joker_cat.jpeg",
+        "image": "images/characters/joker_cat.webp",
     },
     {
         "id": 69,
@@ -60,6 +60,6 @@ personajesRaro = [
         "rarity": "Rare",
         "stats": {"HP": 21, "ATK": 6, "DEF": 9, "SPE": 6, "LCK": 4},
         "lvl": 1,
-        "image": "images/characters/mr_penis.jpeg",
+        "image": "images/characters/mr_penis.webp",
     },
 ]

@@ -6,7 +6,7 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 10, "ATK": 2, "DEF": 3, "SPE": 1, "LCK": 4},
         "lvl": 1,
-        "image": "images/characters/apple_cat.jpeg",
+        "image": "images/characters/apple_cat.webp",
     },
     {
         "id": 2,
@@ -15,7 +15,7 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 8, "ATK": 4, "DEF": 2, "SPE": 2, "LCK": 2},
         "lvl": 1,
-        "image": "images/characters/hmm_cat.jpeg",
+        "image": "images/characters/hmm_cat.webp",
     },
     {
         "id": 3,
@@ -24,7 +24,7 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 9, "ATK": 1, "DEF": 4, "SPE": 3, "LCK": 2},
         "lvl": 1,
-        "image": "images/characters/huh_cat.jpeg",
+        "image": "images/characters/huh_cat.webp",
     },
     {
         "id": 4,
@@ -33,7 +33,7 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 11, "ATK": 2, "DEF": 3, "SPE": 4, "LCK": 1},
         "lvl": 1,
-        "image": "images/characters/nuke_cat.jpeg",
+        "image": "images/characters/nuke_cat.webp",
     },
     {
         "id": 15,
@@ -42,7 +42,7 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 10, "ATK": 2, "DEF": 3, "SPE": 4, "LCK": 1},
         "lvl": 1,
-        "image": "images/characters/blub_cat.jpeg",
+        "image": "images/characters/blub_cat.webp",
     },
     {
         "id": 17,
@@ -51,7 +51,7 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 9, "ATK": 4, "DEF": 1, "SPE": 4, "LCK": 1},
         "lvl": 1,
-        "image": "images/characters/emo_cat.jpeg",
+        "image": "images/characters/emo_cat.webp",
     },
     {
         "id": 23,
@@ -60,7 +60,7 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 9, "ATK": 4, "DEF": 2, "SPE": 2, "LCK": 2},
         "lvl": 1,
-        "image": "images/characters/miguel.jpeg",
+        "image": "images/characters/miguel.webp",
     },
     {
         "id": 24,
@@ -69,7 +69,7 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 10, "ATK": 3, "DEF": 1, "SPE": 1, "LCK": 5},
         "lvl": 1,
-        "image": "images/characters/nom_cat.jpeg",
+        "image": "images/characters/nom_cat.webp",
     },
     {
         "id": 27,
@@ -78,7 +78,7 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 11, "ATK": 1, "DEF": 4, "SPE": 2, "LCK": 3},
         "lvl": 1,
-        "image": "images/characters/smile_cat.jpeg",
+        "image": "images/characters/smile_cat.webp",
     },
     {
         "id": 31,
@@ -87,6 +87,6 @@ personajesComun = [
         "rarity": "Common",
         "stats": {"HP": 8, "ATK": 2, "DEF": 3, "SPE": 3, "LCK": 2},
         "lvl": 1,
-        "image": "images/characters/GoblinHeadChef.jpeg",
+        "image": "images/characters/GoblinHeadChef.webp",
     },
 ]

@@ -6,7 +6,7 @@ personajesUncommon = [
         "rarity": "Uncommon",
         "stats": {"HP": 15, "ATK": 4, "DEF": 6, "SPE": 1, "LCK": 4},
         "lvl": 1,
-        "image": "images/characters/nice_cat.jpeg",
+        "image": "images/characters/nice_cat.webp",
     },
     {
         "id": 6,
@@ -15,7 +15,7 @@ personajesUncommon = [
         "rarity": "Uncommon",
         "stats": {"HP": 14, "ATK": 3, "DEF": 7, "SPE": 2, "LCK": 1},
         "lvl": 1,
-        "image": "images/characters/maxwell_cat.jpeg",
+        "image": "images/characters/maxwell_cat.webp",
     },
     {
         "id": 7,
@@ -24,7 +24,7 @@ personajesUncommon = [
         "rarity": "Uncommon",
         "stats": {"HP": 15, "ATK": 7, "DEF": 4, "SPE": 2, "LCK": 2},
         "lvl": 1,
-        "image": "images/characters/eyebrow_cat.jpeg",
+        "image": "images/characters/eyebrow_cat.webp",
     },
     {
         "id": 8,
@@ -33,7 +33,7 @@ personajesUncommon = [
         "rarity": "Uncommon",
         "stats": {"HP": 16, "ATK": 2, "DEF": 6, "SPE": 4, "LCK": 3},
         "lvl": 1,
-        "image": "images/characters/bleh_cat.jpeg",
+        "image": "images/characters/bleh_cat.webp",
     },
     {
         "id": 14,
@@ -42,7 +42,7 @@ personajesUncommon = [
         "rarity": "Uncommon",
         "stats": {"HP": 17, "ATK": 5, "DEF": 5, "SPE": 4, "LCK": 1},
         "lvl": 1,
-        "image": "images/characters/big_floppa.jpeg",
+        "image": "images/characters/big_floppa.webp",
     },
     {
         "id": 18,
@@ -51,7 +51,7 @@ personajesUncommon = [
         "rarity": "Uncommon",
         "stats": {"HP": 15, "ATK": 8, "DEF": 2, "SPE": 3, "LCK": 2},
         "lvl": 1,
-        "image": "images/characters/explode_cat.jpeg",
+        "image": "images/characters/explode_cat.webp",
     },
     {
         "id": 22,
@@ -60,7 +60,7 @@ personajesUncommon = [
         "rarity": "Uncommon",
         "stats": {"HP": 15, "ATK": 10, "DEF": 2, "SPE": 2, "LCK": 1},
         "lvl": 1,
-        "image": "images/characters/Low-polyJett.jpeg",
+        "image": "images/characters/Low-polyJett.webp",
     },
     {
         "id": 28,
@@ -69,6 +69,6 @@ personajesUncommon = [
         "rarity": "Uncommon",
         "stats": {"HP": 13, "ATK": 3, "DEF": 1, "SPE": 10, "LCK": 1},
         "lvl": 1,
-        "image": "images/characters/tiny_cat.jpeg",
+        "image": "images/characters/tiny_cat.webp",
     },
 ]
