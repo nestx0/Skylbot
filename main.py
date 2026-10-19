@@ -549,17 +549,6 @@ async def pull(ctx, quantity: int | None = None):
 async def inventory(ctx):
     userID = ctx.author.id
     inventory = getInventory(userID)
-    for i in range(quantity):
-        char = pullChar(userID)
-        if char.level > 1:
-            repes += char.name + f" ({char.rarity}) "
-        else:
-            nuevos += char.name + f" ({char.rarity}) "
-
-    nuevos = "" if nuevos == "NEW: " else nuevos
-    repes = "" if repes == "Repeated: " else repes
-    final_mensaje = f"You got the following characters: \n {nuevos} \n {repes}"
-    await ctx.send(final_mensaje)
 
     if not inventory:
         return await ctx.send("No inventory to show")
