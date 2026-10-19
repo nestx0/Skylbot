@@ -53,7 +53,7 @@ class Character:
         self.rarity = info.get("rarity", "Unknown")
         self.level = info.get("lvl", 0)
         self.stats = info.get("stats", None)
-        self.image = info.get("image", "images/characters/maxwell_cat.jpeg")
+        self.image = info.get("image", "images/characters/maxwell_cat.webp")
         if self.rarity == "Common":
             self.color = discord.Color.dark_gray()
         elif self.rarity == "Uncommon":
@@ -114,7 +114,7 @@ class InventoryView(View):
 
     def get_embed(self):
         character = self.data[self.current_page]
-        file = discord.File(character.image, filename="char.jpeg")
+        file = discord.File(character.image, filename="char.webp")
 
         embed = discord.Embed(
             title=f"🎒 Inventory: {character.name}",
@@ -130,7 +130,7 @@ class InventoryView(View):
             embed.add_field(name=stat, value=str(valor), inline=True)
         embed.add_field(name="LVL", value=str(character.level))
 
-        embed.set_image(url=f"attachment://char.jpeg")
+        embed.set_image(url=f"attachment://char.webp")
         embed.set_footer(text=f"Page {self.current_page + 1} out of {len(self.data)}")
 
         return embed, file
@@ -168,7 +168,7 @@ class BossListView(View):
 
     def get_embed(self):
         boss = self.data[self.current_page]
-        file = discord.File(boss.image, filename="boss.jpeg")
+        file = discord.File(boss.image, filename="boss.webp")
 
         embed = discord.Embed(
             title=f"👹 Boss Arena: {boss.name}",
@@ -187,7 +187,7 @@ class BossListView(View):
                 embed.add_field(name=stat, value=str(valor), inline=True)
         embed.add_field(name="LVL", value=str(boss.level))
 
-        embed.set_image(url="attachment://boss.jpeg")
+        embed.set_image(url="attachment://boss.webp")
 
         embed.set_footer(
             text=f"Boss {boss_id} out of {len(self.data)} | Use *boss fight {boss_id} to challenge!"

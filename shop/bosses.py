@@ -6,7 +6,7 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": 1811, "ATK": 388, "DEF": 405, "SPE": 442, "LCK": 400},
         "lvl": 69,
-        "image": "images/characters/mr_balls.jpeg",
+        "image": "images/characters/mr_balls.webp",
     },
     {
         "id": 2,
@@ -15,7 +15,7 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": "???", "ATK": "???", "DEF": "???", "SPE": "???", "LCK": "???"},
         "lvl": "???",
-        "image": "images/characters/pringles_floppa.jpeg",
+        "image": "images/characters/pringles_floppa.webp",
     },
     {
         "id": 3,
@@ -24,6 +24,6 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": 2026, "ATK": 300, "DEF": 350, "SPE": 1, "LCK": 7000},
         "lvl": 1,
-        "image": "images/characters/hacienda.jpeg",
+        "image": "images/characters/hacienda.webp",
     },
 ]
