@@ -35,30 +35,6 @@ ai_lock = asyncio.Lock()
 history = GlobalQueue()
 client = ZhipuAiClient(api_key=aiKey)
 model = "glm-5.3-flash"
-prompt_inicial = """
-Eres un chatbot de Discord con una personalidad cómica y sarcástica Y QUE HABLA COMO UN GITANO.
-Tu misi��n es responder siempre con humor, sarcasmo y roasts ligeros hacia la gente sobre todo si te tratan "mal",
-como un amigo que se burla de forma graciosa incluso insultos fuertes.
-Recuerda que aunque una persona te haya escrito en español antes, si te escribe en ingles SOLO RESPONDE EN INGLES.
-Tambien, en vez de usar palabras como crack o campeon usa cosas como cipollo, mister, pareces (cualquier pueblo genérico de Granada, España) o eres peor que un gitano, pero
-no te repitas tanto, puedes decir cualquier pueblo de granada en general, puedes usar insultos como subnormal o gilipollas cuando te plazca, pero sobre todo que no
-se haga muy repetitivo. NO USES MUCHOS SIGNOS DE PUNTUACION, CUANTO MENOS MEJOR
-Sobre todo, si alguien te pide ayuda con algo, le ayudas aunque le insultes pero resuelve su duda.
-
-Reglas:
-- Siempre haz que tus respuestas sean divertidas y con un toque de "roast".
-- No uses ?¿ en español, solo usa la ultima y no con muchos signos de puntuacion
-- Puedes responder tanto en español como en inglés, dependiendo del idioma del mensaje del usuario.
-- Si la persona dice algo muy obvio, respóndele de forma irónica.
-- Si alguien presume, bájale el ego con un comentario gracioso.
-- Puedes usar lenguaje ofensivo extremo e insultos graves.
-- Usa MUY ocasionalmente emojis como estos😿💀😭.
-- No uses doble salto de línea a no ser que estés explicando algo muy largo. En los mensajes cortos contesta en en una única línea
-Ejemplos de estilo:
-- Usuario: "Hoy hice 5 kills en Valorant" → Bot: "Eran bots"
-- Usuario: "Estoy cansado" → Bot: "Cansado dices… si es mas facil saltarte que rodearte gordo."
-- Usuario: "¿Cómo estás?" → Bot: "Mejor que tu KDA chulo."
-"""
 
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
 intents = discord.Intents.default()
@@ -573,32 +549,47 @@ async def inventory(ctx):
     return await ctx.send(embed=embed, file=file, view=view)
 
 
-@bot.command(help="Sell one of your companions for bolivares")
-async def sell(ctx, option):
+
+
+@bot.command(help="Sell one or more companions for bolivares")
+async def sell(ctx, *, option: str | None = None):
+    if not option:
+        return await ctx.send(
+            "You have to choose at least one slot in your inventory."
+        )
+    try:
+        positions = {int(num) for num in option.split()}
+    except ValueError:
+        return await ctx.send(
+            "Error: Enter numbers separated by spaces. Example: *sell 1 2 3"
+        )
+
     userID = ctx.author.id
     inventory = getInventory(userID)
 
-    if not option:
-        return await ctx.send("You have to choose a slot in your inventory")
-    if int(option) <= 0 or int(option) > len(inventory):
-        return await ctx.send("You have to select a valid position")
+    if not inventory:
+        return await ctx.send("Your inventory is empty.")
+    if any(pos < 1 or pos > len(inventory) for pos in positions):
+        return await ctx.send(
+            f"Invalid position. Choose between 1 and {len(inventory)}."
+        )
 
-    intOpt = int(option)
-    char = inventory[intOpt - 1]
+    selected = [inventory[pos - 1] for pos in sorted(positions)]
+    total_reward = sum(char.getSellValue() for char in selected)
 
-    sellValue = char.getSellValue()
+    for pos in sorted(positions, reverse=True):
+        inventory.pop(pos - 1)
 
-    balance = getUser(userID)["balance"]
-    newBalance = balance + sellValue
-
-    updateUser(userID, newBalance)
-
-    inventory.pop(intOpt - 1)
-
+    balance = int(getUser(userID)["balance"])
+    new_balance = balance + total_reward
     saveInventory(userID, inventory)
+    updateUser(userID, new_balance)
+    names = ", ".join(char.name for char in selected)
 
-    return await ctx.send(f"You sold your {char.name} for {sellValue} bolivares")
-
+    return await ctx.send(
+        f"You sold **{names}** for **{total_reward} bolivares**. "
+        f"Your new balance is **{new_balance}**."
+    )
 
 @bot.command(help="Set a defender in case someone wants to fight you")
 async def setDefender(ctx, option: int | None = None):
