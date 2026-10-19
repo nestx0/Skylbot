@@ -14,6 +14,7 @@ from flask_cors import CORS
 from jokeapi import Jokes
 from zai import ZhipuAiClient
 
+from ai.ai_funcions import prompt_inicial
 from blackjack.game import BlackjackGame
 from blackjack.views import BlackjackView
 from dataBase import *
@@ -24,7 +25,6 @@ from shop.gacha import *
 from shop.lootbox import *
 from shop.rewards import *
 from utilities.colaIA import GlobalQueue, TextBlock
-from ai.ai_funcions import prompt_inicial
 
 app = Flask(__name__)
 CORS(app)
@@ -514,17 +514,24 @@ async def pull(ctx, quantity: int | None = None):
         balance -= PULL_PRICE * quantity
         updateUser(userID, balance)
 
-        nuevos = "NEW: "
-        repes = "Reapeted"
+        nuevos = []
+        repes = []
 
-        for i in range(quantity):
+        for _ in range(quantity):
             char = pullChar(userID)
             if char.level > 1:
-                repes += char.name + f" ({char.rarity}) "
+                repes.append(f"{char.name} ({char.rarity})")
             else:
-                nuevos += char.name + f" ({char.rarity}) "
+                nuevos.append(f"{char.name} ({char.rarity})")
 
-        final_mensaje = f"You got the following characters: \n {nuevos} \n {repes}"
+        # Construimos el mensaje final dinámicamente
+        final_mensaje = "You got the following characters:\n"
+
+        if nuevos:  # Si la lista tiene elementos, los unimos con comas
+            final_mensaje += f"**NEW:** {', '.join(nuevos)}\n"
+        if repes:
+            final_mensaje += f"**Repeated:** {', '.join(repes)}\n"
+
         await ctx.send(final_mensaje)
 
     else:
@@ -550,14 +557,10 @@ async def inventory(ctx):
     return await ctx.send(embed=embed, file=file, view=view)
 
 
-
-
 @bot.command(help="Sell one or more companions for bolivares")
 async def sell(ctx, *, option: str | None = None):
     if not option:
-        return await ctx.send(
-            "You have to choose at least one slot in your inventory."
-        )
+        return await ctx.send("You have to choose at least one slot in your inventory.")
     try:
         positions = {int(num) for num in option.split()}
     except ValueError:
@@ -591,6 +594,7 @@ async def sell(ctx, *, option: str | None = None):
         f"You sold **{names}** for **{total_reward} bolivares**. "
         f"Your new balance is **{new_balance}**."
     )
+
 
 @bot.command(help="Set a defender in case someone wants to fight you")
 async def setDefender(ctx, option: int | None = None):
