@@ -167,7 +167,7 @@ async def joke(ctx):
 async def blackjack(ctx, bet):
 
     balance = int(getUser(ctx.author.id)["balance"])
-    file = discord.File("images/Duala_dealer.png", filename="Duala_dealer.png")
+    file = discord.File("images/Duala_dealer.webp", filename="Duala_dealer.webp")
 
     if isinstance(bet, str) and bet.lower() == "allin":
         bet = balance
@@ -404,8 +404,8 @@ async def ppt(ctx, amount: str):
         color=discord.Color.blue(),
     )
     view = PPTView(ctx.author.id, bet_amount)
-    embed.set_thumbnail(url="attachment://Duala_dealer.png")
-    file = discord.File("images/Duala_dealer.png", filename="Duala_dealer.png")
+    embed.set_thumbnail(url="attachment://Duala_dealer.webp")
+    file = discord.File("images/Duala_dealer.webp", filename="Duala_dealer.webp")
     await ctx.send(embed=embed, view=view, file=file)
 
 
@@ -549,6 +549,17 @@ async def pull(ctx, quantity: int | None = None):
 async def inventory(ctx):
     userID = ctx.author.id
     inventory = getInventory(userID)
+    for i in range(quantity):
+        char = pullChar(userID)
+        if char.level > 1:
+            repes += char.name + f" ({char.rarity}) "
+        else:
+            nuevos += char.name + f" ({char.rarity}) "
+
+    nuevos = "" if nuevos == "NEW: " else nuevos
+    repes = "" if repes == "Repeated: " else repes
+    final_mensaje = f"You got the following characters: \n {nuevos} \n {repes}"
+    await ctx.send(final_mensaje)
 
     if not inventory:
         return await ctx.send("No inventory to show")
