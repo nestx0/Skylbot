@@ -98,7 +98,7 @@ async def on_member_join(member):
 
     if canal:
         await canal.send(f"Welcome {member.mention}, why did you do this")
-        await canal.send(file=discord.File("images/IMG_6372.jpg"))
+        await canal.send(file=discord.File("images/IMG_6372.webp"))
     else:
         print("Channel not found")
 
@@ -555,9 +555,9 @@ async def pull(ctx, quantity: int | None = None):
 
     assert char is not None
     embed = char.toEmbed()
-    archivo = discord.File(char.image, filename="char.jpeg")
+    archivo = discord.File(char.image, filename="char.webp")
 
-    embed.set_image(url="attachment://char.jpeg")
+    embed.set_image(url="attachment://char.webp")
     return await ctx.send(file=archivo, embed=embed)
 
 

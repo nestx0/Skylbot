@@ -54,6 +54,6 @@ class PPTView(discord.ui.View):
                 discord.Color.red()
         )
 
-        embed.set_thumbnail(url="attachment://Duala_dealer.png")
+        embed.set_thumbnail(url="attachment://Duala_dealer.webp")
 
         return await interaction.response.edit_message(embed=embed, view=None)

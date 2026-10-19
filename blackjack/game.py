@@ -23,7 +23,7 @@ class BlackjackGame:
     def generarEmbed(self):
 
         color =  discord.Color.green() if self.state == "Player Turn" else discord.Color.dark_blue()
-        file = discord.File("images/Duala_dealer.png", filename="Duala_dealer.png")
+        file = discord.File("images/Duala_dealer.webp", filename="Duala_dealer.webp")
 
         embed = discord.Embed(
             title="🃏 Blackjack 🃏",
@@ -59,7 +59,7 @@ class BlackjackGame:
 
         self.getResult()
         embed.set_footer(text=self.discordMessage)
-        embed.set_thumbnail(url="attachment://Duala_dealer.png")
+        embed.set_thumbnail(url="attachment://Duala_dealer.webp")
 
         return embed
 
