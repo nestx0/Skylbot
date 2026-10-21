@@ -1,15 +1,17 @@
 import copy
 import random
 
+from .gacha import Character
 
-def fight(char1, char2):
+
+def fight(char1: Character, char2: Character):
     p1 = copy.deepcopy(char1)
     p2 = copy.deepcopy(char2)
     resumen = ""
 
-    p1_max_hp = p1.stats["HP"]
-    p2_max_hp = p2.stats["HP"]
-
+    assert p1.stats is not None
+    assert p2.stats is not None
+    p1_max_hp, p2_max_hp = p1.stats["HP"], p2.stats["HP"]
     p1_init = p1.stats["SPE"] * random.uniform(0.9, 1.1)
     p2_init = p2.stats["SPE"] * random.uniform(0.9, 1.1)
 
@@ -24,22 +26,27 @@ def fight(char1, char2):
     resumen += f"💨 **{attacker.name}** is faster and takes the first strike.\n\n"
 
     turno = 1
-    frenzy_multiplier = 1.0  # En lugar de *= 2, le sumaremos 0.3 cada turno
+    frenzy_multiplier = 1.0
+    winner_name = None
 
     while p1.stats["HP"] > 0 and p2.stats["HP"] > 0:
+        # Eventos Aleatorios de Turno
+        assert attacker.stats is not None
+        assert defender.stats is not None
         if random.randint(1, 100) <= 5:
             if attacker.stats["LCK"] > defender.stats["LCK"]:
                 heal = int(atk_max_hp * 0.15)
-                attacker.stats["HP"] += heal
-                resumen += f"🍀 **LUCKY DROP!** {attacker.name} found a health potion and recovered {heal} HP!\n"
+                attacker.stats["HP"] = min(atk_max_hp, attacker.stats["HP"] + heal)
+                resumen += f"🍀 **LUCKY DROP!** {attacker.name} recovered {heal} HP!\n"
             else:
                 dmg = int(defender.stats["HP"] * 0.10)
-                defender.stats["HP"] -= dmg
+                defender.stats["HP"] = max(0, defender.stats["HP"] - dmg)
                 resumen += f"⚡ **ARENA HAZARD!** A stray lightning hit {defender.name} for {dmg} damage!\n"
 
+        # Evasión
         dodge_chance = min(
             25.0,
-            (defender.stats["SPE"] / attacker.stats["SPE"]) * 5
+            (defender.stats["SPE"] / max(1, attacker.stats["SPE"])) * 5
             + (defender.stats["LCK"] / 20),
         )
 
@@ -48,46 +55,70 @@ def fight(char1, char2):
                 f"🛡️ **Turn {turno}:** {defender.name} gracefully dodged the attack!\n"
             )
         else:
-            base_dmg = (100 * attacker.stats["ATK"]) / (100 + defender.stats["DEF"])
+            base_dmg = (attacker.stats["ATK"] ** 2) / max(
+                1, attacker.stats["ATK"] + defender.stats["DEF"]
+            )
             varianza = random.uniform(0.85, 1.15)
 
-            desperation_mult = 1.0
-            is_desperate = False
-            if attacker.stats["HP"] <= (atk_max_hp * 0.20):
-                desperation_mult = 1.5
-                is_desperate = True
+            is_desperate = attacker.stats["HP"] <= (atk_max_hp * 0.20)
+            desperation_mult = 1.5 if is_desperate else 1.0
 
             prob_critico = min(50.0, attacker.stats["LCK"] / 10.0)
             es_critico = random.uniform(0, 100) < prob_critico
             multiplicador_crit = 1.5 if es_critico else 1.0
 
-            final_dmg = round(
-                base_dmg
-                * varianza
-                * multiplicador_crit
-                * desperation_mult
-                * frenzy_multiplier
+            final_dmg = max(
+                1,
+                round(
+                    base_dmg
+                    * varianza
+                    * multiplicador_crit
+                    * desperation_mult
+                    * frenzy_multiplier
+                ),
             )
-            if final_dmg < 1:
-                final_dmg = 1
 
-            defender.stats["HP"] -= final_dmg
-            if defender.stats["HP"] < 0:
-                defender.stats["HP"] = 0
+            prob_bloqueo = min(20.0, defender.stats["DEF"] / 100.0)
+            bloqueo_texto = ""
+            if random.uniform(0, 100) < prob_bloqueo:
+                final_dmg = round(final_dmg * 0.2)
+                bloqueo_texto = " **(PERFECT GUARD! 🛡️)**"
 
-            crit_text = " **(CRITICAL HIT! 💥)**" if es_critico else ""
-            desp_text = " **(DESPERATION STRIKE! 💢)**" if is_desperate else ""
+            ejecucion_texto = ""
+            if 0 < defender.stats["HP"] < (def_max_hp * 0.15):
+                prob_ejecucion = min(25.0, attacker.stats["LCK"] / 50.0)
+                if random.uniform(0, 100) < prob_ejecucion:
+                    final_dmg = defender.stats["HP"]  # Daño letal garantizado
+                    ejecucion_texto = " **(FATAL EXECUTION! ☠️)**"
 
-            resumen += f"🥊 **Turn {turno}:** {attacker.name} deals {final_dmg} damage!{crit_text}{desp_text} ({defender.name} HP: {defender.stats['HP']})\n"
+            defender.stats["HP"] = max(0, defender.stats["HP"] - final_dmg)
+
+            crit_text = (
+                " **(CRITICAL HIT! 💥)**" if es_critico and not ejecucion_texto else ""
+            )
+            desp_text = " **(DESPERATION! 💢)**" if is_desperate else ""
+
+            resumen += f"🥊 **Turn {turno}:** {attacker.name} deals {final_dmg} damage!{crit_text}{desp_text}{bloqueo_texto}{ejecucion_texto} ({defender.name} HP: {defender.stats['HP']})\n"
+
+            if defender.stats["HP"] > 0:
+                diferencia_velocidad = attacker.stats["SPE"] / max(
+                    1, defender.stats["SPE"]
+                )
+                if diferencia_velocidad > 1.5 and random.uniform(0, 100) < 30.0:
+                    extra_dmg = max(
+                        1, round(final_dmg * 0.5)
+                    )  # El golpe extra hace la mitad de daño
+                    defender.stats["HP"] = max(0, defender.stats["HP"] - extra_dmg)
+                    resumen += f"🌪️ **SPEED BURST!** {attacker.name} is too fast and lands an extra hit for {extra_dmg} damage! ({defender.name} HP: {defender.stats['HP']})\n"
 
         if defender.stats["HP"] <= 0:
             resumen += f"\n🏆 **FIGHT OVER! {attacker.name} stands victorious!**"
+            winner_name = attacker.name
             break
 
         attacker, defender = defender, attacker
         atk_max_hp, def_max_hp = def_max_hp, atk_max_hp
         turno += 1
-
         frenzy_multiplier += 0.3
 
         if turno == 10:
@@ -97,4 +128,4 @@ def fight(char1, char2):
             resumen += "\n⏳ **Time Limit Reached! It's a DRAW!**"
             break
 
-    return resumen, attacker.name
+    return resumen, winner_name
