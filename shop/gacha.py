@@ -12,7 +12,7 @@ from .personajesRaro import personajesRaro
 from .personajesUncommon import personajesUncommon
 
 stats = ["ATK", "DEF", "SPE", "LCK", "HP"]
-MAX_LEVEL = 250
+MAX_LEVEL = 500
 
 
 class RarityConfig:

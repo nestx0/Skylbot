@@ -9,7 +9,7 @@ import time
 import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from flask_cors import CORS
 from jokeapi import Jokes
 from zai import ZhipuAiClient
@@ -18,7 +18,6 @@ from ai.ai_funcions import prompt_inicial
 from blackjack.game import BlackjackGame
 from blackjack.views import BlackjackView
 from dataBase import *
-from ppt.ppt_game import PPTGame
 from ppt.ppt_view import PPTView
 from roulette.roulette import *
 from shop.bosses import bosses, bossHandler
@@ -62,6 +61,7 @@ activities = itertools.cycle(
 @bot.event
 async def on_ready():
     change_activity.start()
+    assert bot.user is not None
     print(f"We are ready to go, {bot.user.name}")
 
 
