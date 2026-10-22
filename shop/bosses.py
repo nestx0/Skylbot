@@ -14,7 +14,7 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": 1811, "ATK": 388, "DEF": 405, "SPE": 442, "LCK": 400},
         "lvl": 69,
-        "image": "images/characters/mr_balls.webp",
+        "image": "assets/characters/mr_balls.webp",
     },
     {
         "id": 2,
@@ -23,7 +23,7 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": "???", "ATK": "???", "DEF": "???", "SPE": "???", "LCK": "???"},
         "lvl": "???",
-        "image": "images/characters/pringles_floppa.webp",
+        "image": "assets/characters/pringles_floppa.webp",
     },
     {
         "id": 3,
@@ -32,7 +32,7 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": 2026, "ATK": 300, "DEF": 350, "SPE": 1, "LCK": 7000},
         "lvl": 1,
-        "image": "images/characters/hacienda.webp",
+        "image": "assets/characters/hacienda.webp",
     },
     {
         "id": 4,
@@ -41,7 +41,7 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": 3000, "ATK": 255, "DEF": 140, "SPE": 300, "LCK": 1000},
         "lvl": 1,
-        "image": "images/characters/furina.webp",
+        "image": "assets/characters/furina.webp",
     },
     {
         "id": 5,
@@ -50,7 +50,7 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": 1000, "ATK": 1000, "DEF": 30, "SPE": 370, "LCK": 67},
         "lvl": 1,
-        "image": "images/characters/jaggercat.webp",
+        "image": "assets/characters/jaggercat.webp",
     },
     {
         "id": 6,
@@ -59,7 +59,7 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": 1789, "ATK": 333, "DEF": 700, "SPE": 105, "LCK": 1},
         "lvl": 1,
-        "image": "images/characters/tiredteto.webp",
+        "image": "assets/characters/tiredteto.webp",
     },
     {
         "id": 7,
@@ -68,7 +68,7 @@ bosses = [
         "rarity": "Boss",
         "stats": {"HP": 2222, "ATK": 372, "DEF": 302, "SPE": 222, "LCK": 222},
         "lvl": 1,
-        "image": "images/characters/netandyahu.webp",
+        "image": "assets/characters/netandyahu.webp",
     },
 ]
 

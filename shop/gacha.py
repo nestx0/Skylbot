@@ -4,12 +4,9 @@ from typing import ClassVar
 
 import discord
 
-from dataBase import *
+from database.dataBase import *
 
-from .personajesComun import personajesComun
-from .personajesEpic import personajesEpico
-from .personajesRaro import personajesRaro
-from .personajesUncommon import personajesUncommon
+from .personajes import personajesComun, personajesEpico, personajesRaro, personajesUncommon
 
 stats = ["ATK", "DEF", "SPE", "LCK", "HP"]
 MAX_LEVEL = 500
@@ -99,11 +96,12 @@ class Character:
         self.rarity = info.get("rarity", "Unknown")
         self.level = info.get("lvl", 0)
         self.stats = info.get("stats", None)
-        imagen_guardada = info.get("image", "images/characters/maxwell_cat.webp")
+        imagen_guardada = info.get("image", "assets/characters/maxwell_cat.webp")
         self.image = (
             imagen_guardada.replace(".jpeg", ".webp")
             .replace(".png", ".webp")
             .replace(".jpg", ".webp")
+            .replace("images", "assets")
         )
         self.color = RarityConfig.get(self.rarity)["color"]
 

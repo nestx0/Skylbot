@@ -1,4 +1,4 @@
-from blackjack.cards import generarDeck, shuffleDeck, repartirCartasBJ, calcularValor, draw
+from juegos.blackjack.cards import generarDeck, shuffleDeck, repartirCartasBJ, calcularValor, draw
 import discord
 
 class BlackjackGame:
@@ -23,7 +23,7 @@ class BlackjackGame:
     def generarEmbed(self):
 
         color =  discord.Color.green() if self.state == "Player Turn" else discord.Color.dark_blue()
-        file = discord.File("images/Duala_dealer.webp", filename="Duala_dealer.webp")
+        file = discord.File("assets/Duala_dealer.webp", filename="Duala_dealer.webp")
 
         embed = discord.Embed(
             title="🃏 Blackjack 🃏",

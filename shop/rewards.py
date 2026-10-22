@@ -1,7 +1,6 @@
 import random
 
-from dataBase import *
-
+from database.dataBase import *
 
 class coinReward:
     def __init__(self, rarity: str):

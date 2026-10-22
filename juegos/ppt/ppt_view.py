@@ -1,6 +1,6 @@
 import discord
-from ppt.ppt_game import PPTGame
-from dataBase import getUser, updateUser
+from juegos.ppt.ppt_game import PPTGame
+from database.dataBase import getUser, updateUser
 
 class PPTView(discord.ui.View):
     def __init__(self, user_id, amount: int):

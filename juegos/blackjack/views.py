@@ -1,6 +1,6 @@
 import discord
 from discord.ui import Button, View
-from dataBase import getUser, updateUser
+from database.dataBase import getUser, updateUser
 
 class BlackjackView(View):
     def __init__(self, juego):

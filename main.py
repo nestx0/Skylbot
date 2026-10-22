@@ -15,18 +15,18 @@ from jokeapi import Jokes
 from zai import ZhipuAiClient
 
 from ai.ai_funcions import prompt_inicial
-from blackjack.game import BlackjackGame
-from blackjack.views import BlackjackView
-from dataBase import *
-from ppt.ppt_view import PPTView
-from roulette.roulette import *
+from juegos.blackjack.game import BlackjackGame
+from juegos.blackjack.views import BlackjackView
+from database.dataBase import *
+from juegos.ppt.ppt_view import PPTView
+from juegos.roulette.roulette import *
 from shop.bosses import bosses, bossHandler
 from shop.fights import fight
 from shop.gacha import *
 from shop.lootbox import *
 from shop.rewards import *
 from shop.views import BossListView, InventoryView
-from utilities.colaIA import GlobalQueue, TextBlock
+from ai.colaIA import GlobalQueue, TextBlock
 
 app = Flask(__name__)
 CORS(app)
@@ -78,7 +78,7 @@ async def on_member_join(member):
 
     if canal:
         await canal.send(f"Welcome {member.mention}, why did you do this")
-        await canal.send(file=discord.File("images/IMG_6372.webp"))
+        await canal.send(file=discord.File("assets/IMG_6372.webp"))
     else:
         print("Channel not found")
 
@@ -116,7 +116,7 @@ async def on_message(message):
         await message.delete()
         if now - lastTimeGIF >= 30:
             lastTimeGIF = now
-            await message.channel.send(file=discord.File("images/image0.gif"))
+            await message.channel.send(file=discord.File("assets/image0.gif"))
 
     if message.type == discord.MessageType.new_member:
         await message.delete()
@@ -170,7 +170,7 @@ async def joke(ctx):
 async def blackjack(ctx, bet):
 
     balance = int(getUser(ctx.author.id)["balance"])
-    file = discord.File("images/Duala_dealer.webp", filename="Duala_dealer.webp")
+    file = discord.File("assets/Duala_dealer.webp", filename="Duala_dealer.webp")
 
     if isinstance(bet, str) and bet.lower() == "allin":
         bet = balance
@@ -256,7 +256,7 @@ async def leaderboard(ctx):
 
 @bot.command(help="Too good to be true")
 async def jackblack(ctx, *, msg):
-    await ctx.send(file=discord.File("images/jack-black-minecraft.gif"))
+    await ctx.send(file=discord.File("assets/jack-black-minecraft.gif"))
 
 
 @bot.command(help="Pay an amount to another member")
@@ -365,6 +365,38 @@ async def roulette(ctx, amount=None, choice=None, *, numbers: str | None = None)
                 await ctx.send(
                     f"Number chosen was {result}{decor}, better luck next time"
                 )
+
+
+@bot.command(help="Let's play rock, paper, scissors")
+async def ppt(ctx, amount: str):
+
+    bet_amount = 0
+    balance = getUser(ctx.author.id)["balance"]
+    balance = str(balance)
+    if isinstance(amount, str) and amount.lower() == "allin":
+        bet_amount = int(balance)
+    else:
+        try:
+            bet_amount = int(amount)
+            if bet_amount < 1:
+                return await ctx.send("❌ You must bet at least 1 point.")
+        except ValueError:
+            return await ctx.send("❌ You must enter a number or 'allin'.")
+    if bet_amount > int(balance):
+        return await ctx.send("❌ Not enough balance.")
+    newBalance = int(balance) - bet_amount
+    updateUser(ctx.author.id, newBalance)
+
+    embed = discord.Embed(
+        title="Rock, Paper, Scissors",
+        description="Click to start🤯",
+        color=discord.Color.blue(),
+    )
+    view = PPTView(ctx.author.id, bet_amount)
+    embed.set_thumbnail(url="attachment://Duala_dealer.webp")
+    file = discord.File("assets/Duala_dealer.webp", filename="Duala_dealer.webp")
+    await ctx.send(embed=embed, view=view, file=file)
+
 
 @bot.command(help="Do you wanna test your luck with a lootbox ?")
 async def lootbox(ctx):
