@@ -72,7 +72,6 @@ bosses = [
     },
 ]
 
-
 class Boss(Character):
     def apply_pre_fight_effect(self, char: Character) -> str:
         return ""
@@ -92,24 +91,20 @@ class Boss(Character):
         target_class = boss_classes.get(info.get("name", ""), cls)
         return target_class(info)
 
-
 class MrBallsBoss(Boss):
     def apply_pre_fight_effect(self, char: Character) -> str:
         return super().apply_pre_fight_effect(char)
-
 
 class HaciendaBoss(Boss):
     def apply_pre_fight_effect(self, char: Character) -> str:
         statsMultiplier(char, 0.5)
         return "Hacienda halved all your stats"
 
-
 class PringlesFloppaBoss(Boss):
     def apply_pre_fight_effect(self, char: Character) -> str:
         self.stats = copy.deepcopy(char.stats)
         statsMultiplier(self, 1.15)
         return "Pringles Floppa copied your stats 15% better"
-
 
 class FurinaBoss(Boss):
     def apply_pre_fight_effect(self, char: Character) -> str:
@@ -120,7 +115,6 @@ class FurinaBoss(Boss):
 
         return msg
 
-
 class TiredTetoBoss(Boss):
     def apply_pre_fight_effect(self, char: Character) -> str:
         msg = ""
@@ -129,7 +123,6 @@ class TiredTetoBoss(Boss):
             msg += "Due to your char rarity, Teto got 4 times stronger !"
 
         return msg
-
 
 class JaggerCatBoss(Boss):
     def apply_pre_fight_effect(self, char: Character) -> str:
@@ -140,7 +133,6 @@ class JaggerCatBoss(Boss):
 
         return msg
 
-
 class NetAndYahuBoss(Boss):
     def apply_pre_fight_effect(self, char: Character) -> str:
         msg = ""
@@ -150,8 +142,30 @@ class NetAndYahuBoss(Boss):
 
         return msg
 
+class SomethingBoss1(Boss):
+    def apply_pre_fight_effect(self, char: Character) -> str:
+        assert char.stats is not None and self.stats is not None
+        msg = ""
+        if char.stats["LCK"] < self.stats["LCK"]:
+            increase = random.randint(2, 5)
+            statsMultiplier(self, increase)
+            msg += f"Due to yout LCK being lower than boss', its stats grew {increase} times \n"
+        else:
+            msg += "Nothing strange happened... \n"
+        return msg
 
-# Hacer 4 bosses, uno que cuadruplique sus estadísticas * 4
+class SomethingBoss2(Boss):
+    def apply_pre_fight_effect(self, char: Character) -> str:
+        msg = ""
+        assert char.stats is not None and self.stats is not None
+        self.stats["SPE"] = char.stats["SPE"] * 2
+        msg += "The boss doubled your speed !"
+        return msg
+
+# Ponerle mucho ataque, 500 de velocidad y como 1 de defensa y 67 de vida
+class GlassCanonBoss(Boss):
+    def apply_pre_fight_effect(self, char: Character) -> str:
+        return "No special mechanic yet..."
 
 
 def bossHandler(charP, option: int):

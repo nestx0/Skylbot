@@ -5,6 +5,7 @@ import os
 import random
 import threading
 import time
+from typing import Any, cast
 
 import discord
 from discord.ext import commands, tasks
@@ -54,7 +55,13 @@ tiempo_of_las_mio = 0
 bot = commands.Bot(command_prefix="*", intents=intents)
 
 activities = itertools.cycle(
-    ["🏓 Playing Ping-pong", "📖 Reading Documentation", "🔧 Repairing", "💤 Sleeping"]
+    [
+        "🏓 Playing Ping-pong",
+        "📖 Reading Documentation",
+        "🔧 Repairing",
+        "💤 Sleeping",
+        "Filling a Token De Asistencia",
+    ]
 )
 
 
@@ -93,9 +100,6 @@ async def on_message(message):
 
     if message.author == bot.user:
         return
-        #    if client.user.mentioned_in(message):
-
-        # ai()
 
     if peruano == 69:
         return await message.channel.send("Silencio peruano")
@@ -153,7 +157,7 @@ async def poll(ctx, *, msg):
 @bot.command(help="Random joke, go!")
 async def joke(ctx):
     j = await Jokes()
-    joke = await j.get_joke()
+    joke = cast(dict[str, Any], await j.get_joke())
 
     msg = ""
 
@@ -279,8 +283,7 @@ async def pay(ctx, member: discord.Member, amount: int):
 
 
 @bot.command(help="A classic game of roulette with some options")
-async def roulette(ctx, amount=None, choice=None, *, numbers: str | None = None):
-
+async def roulette(ctx, amount, choice=None, *, numbers: str | None = None):
     balance = getUser(ctx.author.id)["balance"]
     numbas = getNumbers()
     if isinstance(amount, str) and amount.lower() == "allin":
@@ -369,7 +372,6 @@ async def roulette(ctx, amount=None, choice=None, *, numbers: str | None = None)
 
 @bot.command(help="Let's play rock, paper, scissors")
 async def ppt(ctx, amount: str):
-
     bet_amount = 0
     balance = getUser(ctx.author.id)["balance"]
     balance = str(balance)
@@ -411,7 +413,7 @@ async def lootbox(ctx):
     rarity = openLootBox()
     cuantReward = handleLootBox(rarity=rarity, userID=userID)
     return await ctx.send(
-        f"You got a **{rarity}** lootbox, you obtained {cuantReward} bolivares 🐱‍👤"
+        f"You got a **{rarity}** lootbox, you obtained {cuantReward} bolivares 🐱👤"
     )
 
 
@@ -769,7 +771,6 @@ async def ai(ctx, *, mensaje: str):
         except asyncio.TimeoutError:
             await ctx.send("⏳ La IA tardó demasiado. Intenta de nuevo más tarde.")
             return
-
         text = response.choices[0].message.content
         if not text:
             await ctx.send("⚠️ La IA devolvió una respuesta vacía.")
