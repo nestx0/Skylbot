@@ -281,21 +281,6 @@ async def pay(ctx, member: discord.Member, amount: int):
 @bot.command(help="A classic game of roulette with some options")
 async def roulette(ctx, amount=None, choice=None, *, numbers: str | None = None):
 
-    options = [
-        "red",
-        "black",
-        "green",
-        "1st",
-        "2nd",
-        "3rd",
-        "half1",
-        "half2",
-        "numbers",
-        "orphans",
-        "gserie",
-        "5/8",
-        "zerozone",
-    ]
     balance = getUser(ctx.author.id)["balance"]
     numbas = getNumbers()
     if isinstance(amount, str) and amount.lower() == "allin":
@@ -380,37 +365,6 @@ async def roulette(ctx, amount=None, choice=None, *, numbers: str | None = None)
                 await ctx.send(
                     f"Number chosen was {result}{decor}, better luck next time"
                 )
-
-
-@bot.command(help="Let's play rock, paper, scissors")
-async def ppt(ctx, amount: str):
-    bet_amount = 0
-    balance = getUser(ctx.author.id)["balance"]
-    balance = str(balance)
-    if isinstance(amount, str) and amount.lower() == "allin":
-        bet_amount = int(balance)
-    else:
-        try:
-            bet_amount = int(amount)
-            if bet_amount < 1:
-                return await ctx.send("❌ You must bet at least 1 point.")
-        except ValueError:
-            return await ctx.send("❌ You must enter a number or 'allin'.")
-    if bet_amount > int(balance):
-        return await ctx.send("❌ Not enough balance.")
-    newBalance = int(balance) - bet_amount
-    updateUser(ctx.author.id, newBalance)
-
-    embed = discord.Embed(
-        title="Rock, Paper, Scissors",
-        description="Click to start🤯",
-        color=discord.Color.blue(),
-    )
-    view = PPTView(ctx.author.id, bet_amount)
-    embed.set_thumbnail(url="attachment://Duala_dealer.webp")
-    file = discord.File("images/Duala_dealer.webp", filename="Duala_dealer.webp")
-    await ctx.send(embed=embed, view=view, file=file)
-
 
 @bot.command(help="Do you wanna test your luck with a lootbox ?")
 async def lootbox(ctx):
