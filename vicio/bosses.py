@@ -1,4 +1,5 @@
 import copy
+import random
 
 from vicio.fights import fight
 from vicio.gacha import Character
