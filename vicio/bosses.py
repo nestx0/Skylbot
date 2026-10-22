@@ -1,7 +1,7 @@
 import copy
 
-from shop.fights import fight
-from shop.gacha import Character
+from vicio.fights import fight
+from vicio.gacha import Character
 
 stats = ["ATK", "DEF", "SPE", "LCK", "HP"]
 RARITY_INCREASED_STATS = 4

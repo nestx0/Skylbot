@@ -9,7 +9,7 @@
 
 import random
 
-from shop.rewards import *
+from vicio.rewards import *
 
 
 def openLootBox():

@@ -20,12 +20,12 @@ from juegos.blackjack.views import BlackjackView
 from database.dataBase import *
 from juegos.ppt.ppt_view import PPTView
 from juegos.roulette.roulette import *
-from shop.bosses import bosses, bossHandler
-from shop.fights import fight
-from shop.gacha import *
-from shop.lootbox import *
-from shop.rewards import *
-from shop.views import BossListView, InventoryView
+from vicio.bosses import bosses, bossHandler
+from vicio.fights import fight
+from vicio.gacha import *
+from vicio.lootbox import *
+from vicio.rewards import *
+from vicio.views import BossListView, InventoryView
 from ai.colaIA import GlobalQueue, TextBlock
 
 app = Flask(__name__)

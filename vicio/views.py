@@ -1,7 +1,7 @@
 import discord
 from discord.ui import Button, View
 
-from shop.gacha import Character
+from vicio.gacha import Character
 
 from .bosses import bosses
 
