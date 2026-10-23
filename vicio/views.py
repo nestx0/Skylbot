@@ -93,7 +93,7 @@ class BossListView(PaginatedView):
         return embed, file
 
 
-#====================================================================================================
+# ====================================================================================================
 
 
 async def inventory(ctx):
@@ -132,7 +132,7 @@ async def boss(
 
         charPlayer = inventory[char - 1]
 
-        resumen = bossHandler(charPlayer, boss)
+        resumen, _ = bossHandler(charPlayer, boss)
 
         if len(resumen) > 1990:
             await ctx.send(resumen[:1990] + "...")
