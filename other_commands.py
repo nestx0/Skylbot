@@ -1,10 +1,11 @@
-import discord
 import random
-
-from database.dataBase import getUser, updateUser, getLeaderboard
-from discord.ext import commands
 from typing import Any, cast
+
+import discord
+from discord.ext import commands
 from jokeapi import Jokes
+
+from database.dataBase import getLeaderboard, getUser, updateUser
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -12,6 +13,7 @@ intents.members = True
 bot = commands.Bot(command_prefix="*", intents=intents)
 
 mio_estado = {"activo": False, "reclamado": False}
+
 
 async def guide(ctx):
 

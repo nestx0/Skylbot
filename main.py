@@ -12,15 +12,15 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 
 from database.dataBase import *
-from vicio.gacha import pullChar
-from vicio.lootbox import lootbox
-from vicio.views import inventory, boss
-from vicio.fights import combat, setDefender
-from vicio.gacha_commands import *
 from juegos.blackjack.game import blackjack, jackblack
 from juegos.ppt import ppt
 from juegos.roulette import roulette
 from other_commands import *
+from vicio.fights import combat, setDefender
+from vicio.gacha import pullChar
+from vicio.gacha_commands import *
+from vicio.lootbox import lootbox
+from vicio.views import boss, inventory
 
 app = Flask(__name__)
 CORS(app)
@@ -39,49 +39,66 @@ activities = itertools.cycle(
     [
         "🏓 Playing Ping-pong",
         "📖 Reading Documentation",
-        "🔧 Repairing",
-        "💤 Sleeping",
+        "Sleeping",
         "Filling a Token of Assistance",
+        "Fighting Somali Pirates",
+        "Destroying fascism",
     ]
 )
 
 
-#vicio/
-#lootbox.py
-bot.command(name="lootbox", help="Do you wanna test your luck with a lootbox ?")(lootbox)
-#views.py
+# vicio/
+# lootbox.py
+bot.command(name="lootbox", help="Do you wanna test your luck with a lootbox ?")(
+    lootbox
+)
+# views.py
 bot.command(name="inventory", help="Shows your inventory of companions")(inventory)
 bot.command(name="boss", help="Fight some bosses or something")(boss)
-#fights.py
+# fights.py
 bot.command(name="combat", help="Fight your friend's defender")(combat)
-bot.command(name="setDefender", help="Set a defender in case someone wants to fight you")(setDefender)
-#gacha.py
-bot.command(name="pull", help="Get one of many characters to sell or fight with them")(pull)
+bot.command(
+    name="setDefender", help="Set a defender in case someone wants to fight you"
+)(setDefender)
+# gacha.py
+bot.command(name="pull", help="Get one of many characters to sell or fight with them")(
+    pull
+)
 bot.command(name="sell", help="Sell one or more companions for bolivares")(sell)
-bot.command(name="train", help="Train a companion of your choice, with a cooldown obviously")(train)
+bot.command(
+    name="train", help="Train a companion of your choice, with a cooldown obviously"
+)(train)
 
-#juegos/
-#ppt.py
+# juegos/
+# ppt.py
 bot.command(name="ppt", help="Let's play rock, paper, scissors")(ppt)
-#roulette.py
-bot.command(name="roulette", help="A classic game of roulette with some options")(roulette)
-#blackjack/game.py
-bot.command(name="blackjack", help="Play a classic Blackjack hand using points as bets")(blackjack)
+# roulette.py
+bot.command(name="roulette", help="A classic game of roulette with some options")(
+    roulette
+)
+# blackjack/game.py
+bot.command(
+    name="blackjack", help="Play a classic Blackjack hand using points as bets"
+)(blackjack)
 bot.command(name="jackblack", help="Too good to be true")(jackblack)
 
-#ai/ai_functions.py
+# ai/ai_functions.py
 bot.command(name="ai", help="Ask Skylbot about anything, it will answer")(ai)
 bot.command(name="clear", help="Make Skylbot forget what you told it")(clear)
 
-#other_commands.py
+# other_commands.py
 bot.command(name="guide", help="Kinda self-explanatory")(guide)
 bot.command(name="ping", help="pong")(ping)
 bot.command(name="poll", help="Quick question about anything")(poll)
 bot.command(name="joke", help="Random joke, go!")(joke)
+
+# Economy commands
 bot.command(name="work", help="Get some points to bet on Blackjack")(work)
 bot.command(name="pay", help="Pay an amount to another member")(pay)
 bot.command(name="balance", help="Check your current balance")(balance)
-bot.command(name="leaderboard", help="Get the top 10 members with the most points")(leaderboard)
+bot.command(name="leaderboard", help="Get the top 10 members with the most points")(
+    leaderboard
+)
 bot.command(name="mine", help="Grab a reward if you're quick enough")(mine)
 bot.command(name="buyRole", help="Secret role for 200k")(buyRole)
 
@@ -145,9 +162,7 @@ async def on_message(message):
         await message.delete()
         if now - lastTimeGIF >= 30:
             lastTimeGIF = now
-            await message.channel.send(
-                file=discord.File("assets/image0.gif")
-            )
+            await message.channel.send(file=discord.File("assets/image0.gif"))
 
     if message.type == discord.MessageType.new_member:
         await message.delete()
