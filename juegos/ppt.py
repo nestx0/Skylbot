@@ -2,19 +2,19 @@ import discord
 import random
 from database.dataBase import getUser, updateUser
 
-OPTIONS = {
-    "Rock": "🪨",
-    "Paper": "📄",
-    "Scissors": "✂️"
-}
-
-WIN_CONDITIONS = {
-    "Rock": "Scissors",
-    "Paper": "Rock",
-    "Scissors": "Paper"
-}
-
 class PPT(discord.ui.View):
+
+    OPTIONS = {
+        "Rock": "🪨",
+        "Paper": "📄",
+        "Scissors": "✂️"
+    }
+
+    WIN_CONDITIONS = {
+        "Rock": "Scissors",
+        "Paper": "Rock",
+        "Scissors": "Paper"
+    }
 
     @classmethod
     def get_bot_choice(cls):

@@ -11,8 +11,7 @@ intents.message_content = True
 intents.members = True
 bot = commands.Bot(command_prefix="*", intents=intents)
 
-mio_activo = False
-mio_reclamado = False
+mio_estado = {"activo": False, "reclamado": False}
 
 async def guide(ctx):
 
@@ -157,13 +156,11 @@ async def buyRole(ctx):
 
 
 async def mine(ctx):
-    global mio_activo, mio_reclamado
-
-    if not mio_activo:
+    if not mio_estado["activo"]:
         await ctx.send("❌ No free bolivares now.")
         return
 
-    if mio_reclamado:
+    if mio_estado["reclamado"]:
         await ctx.send("⚠️ Reward already claimed.")
         return
 
@@ -172,8 +169,8 @@ async def mine(ctx):
     new_balance = userBalance + cantidad_de_bolívares_gratis
     updateUser(ctx.author.id, new_balance)
 
-    mio_reclamado = True
-    mio_activo = False
+    mio_estado["reclamado"] = True
+    mio_estado["activo"] = False
 
     await ctx.send(
         f"🏆 {ctx.author.mention} won {cantidad_de_bolívares_gratis} bolivares."

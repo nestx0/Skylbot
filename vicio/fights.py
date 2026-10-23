@@ -161,7 +161,7 @@ async def combat(ctx, option: int | None = None, rival: discord.Member | None = 
     userChar = userInventory[option - 1]
     rivalChar = rivalInventory[0]
 
-    resumen = fight(userChar, rivalChar)
+    resumen, winner = fight(userChar, rivalChar)
     if len(resumen) > 1990:
         await ctx.send(resumen[:1990] + "...")
         await ctx.send("..." + resumen[1990:])

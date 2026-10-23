@@ -1,5 +1,5 @@
 import discord
-from discord.ui import View
+from discord.ui import Button, View
 from database.dataBase import getUser, updateUser
 
 class BlackjackView(View):
@@ -8,7 +8,7 @@ class BlackjackView(View):
         self.juego = juego  
 
     @discord.ui.button(label="Hit", style=discord.ButtonStyle.green)
-    async def pedirCarta(self, interaction):
+    async def pedirCarta(self, interaction, button):
         if self.juego.jugador == interaction.user:
             await self.juego.handleHit()
             newEmbed = self.juego.generarEmbed()
@@ -18,7 +18,7 @@ class BlackjackView(View):
             await interaction.response.edit_message(embed=newEmbed, view=view)
 
     @discord.ui.button(label="Stand", style=discord.ButtonStyle.red)
-    async def plantarse(self, interaction):
+    async def plantarse(self, interaction, button):
         if self.juego.jugador ==  interaction.user:
             await self.juego.handleStand()
             newEmbed = self.juego.generarEmbed()

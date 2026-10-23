@@ -112,6 +112,7 @@ async def train(ctx, option: int | None = None):
     inventory = getInventory(userID)
 
     if option == None:
+        ctx.command.reset_cooldown(ctx)
         return await ctx.send(
             "Run the command like this: *train <postion in your inventory>"
         )

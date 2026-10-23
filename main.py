@@ -20,13 +20,14 @@ from vicio.gacha_commands import *
 from juegos.blackjack.game import blackjack, jackblack
 from juegos.ppt import ppt
 from juegos.roulette import roulette
-from ai.ai_funcions import ai, clear
 from other_commands import *
 
 app = Flask(__name__)
 CORS(app)
 
 load_dotenv()
+from ai.ai_funcions import ai, clear
+
 token = os.getenv("DISCORD_TOKEN")
 
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
@@ -50,9 +51,9 @@ activities = itertools.cycle(
 bot.command(name="lootbox", help="Do you wanna test your luck with a lootbox ?")(lootbox)
 #views.py
 bot.command(name="inventory", help="Shows your inventory of companions")(inventory)
-bot.command(name="boss", help="Fight your friend's defender")(boss)
+bot.command(name="boss", help="Fight some bosses or something")(boss)
 #fights.py
-bot.command(name="combat", help="Fight some bosses or something")(combat)
+bot.command(name="combat", help="Fight your friend's defender")(combat)
 bot.command(name="setDefender", help="Set a defender in case someone wants to fight you")(setDefender)
 #gacha.py
 bot.command(name="pull", help="Get one of many characters to sell or fight with them")(pull)
@@ -69,7 +70,7 @@ bot.command(name="blackjack", help="Play a classic Blackjack hand using points a
 bot.command(name="jackblack", help="Too good to be true")(jackblack)
 
 #ai/ai_functions.py
-bot.command(name="ai", help="Make Skylbot forget what you told it")(ai)
+bot.command(name="ai", help="Ask Skylbot about anything, it will answer")(ai)
 bot.command(name="clear", help="Make Skylbot forget what you told it")(clear)
 
 #other_commands.py
@@ -113,7 +114,7 @@ async def on_member_join(member):
 @bot.event
 async def on_message(message):
 
-    global lastTimeGIF, mio_activo, mio_reclamado, tiempo_of_las_mio
+    global lastTimeGIF, tiempo_of_las_mio
 
     now = time.time()
     peruano = random.randint(1, 500)
@@ -124,23 +125,29 @@ async def on_message(message):
     if peruano == 69:
         return await message.channel.send("Silencio peruano")
 
-    if mio_activo == False and peruano == 420:
-        mio_activo = True
-        mio_reclamado = False
+    if not mio_estado["activo"] and peruano == 420:
+        mio_estado["activo"] = True
+        mio_estado["reclamado"] = False
         tiempo_of_las_mio = now
         await message.channel.send(
             "🎁 ¡Free bolivares! The first one to write *mine obtains the reward. 🎁"
         )
 
-    if mio_activo and not mio_reclamado and now - tiempo_of_las_mio > 30:
-        mio_activo = False
+    if (
+        mio_estado["activo"]
+        and not mio_estado["reclamado"]
+        and now - tiempo_of_las_mio > 30
+    ):
+        mio_estado["activo"] = False
         await message.channel.send("⏱️ No one claimed ")
 
     if "nigga" in message.content.lower():
         await message.delete()
         if now - lastTimeGIF >= 30:
             lastTimeGIF = now
-            await message.channel.send(file=discord.File("assets/image0.gif"))
+            await message.channel.send(
+                file=discord.File("assets/image0.gif")
+            )
 
     if message.type == discord.MessageType.new_member:
         await message.delete()
