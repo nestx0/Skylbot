@@ -1,5 +1,54 @@
-from juegos.blackjack.cards import generarDeck, shuffleDeck, repartirCartasBJ, calcularValor, draw
 import discord
+import random
+
+from database.dataBase import getUser, updateUser
+from .views import BlackjackView
+
+def generarDeck():
+    suits = ["♥️","♦️","♣️","♠️"]
+    ranks = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"]
+    return [{"rank": r, "suit": s} for s in suits for r in ranks]
+
+def shuffleDeck(deck):
+    random.shuffle(deck)
+
+def repartirCartasBJ(deck):
+
+    manoJugador = {
+        "cartas":[deck.pop(),deck.pop()],
+        "puntuacion":0,
+        "esBlackJack":False
+    }
+
+    manoDealer = {
+        "cartas":[deck.pop(),deck.pop()],
+        "puntuacion":0,
+        "esBlackJack":False
+    }
+
+    return manoJugador, manoDealer
+
+def calcularValor(mano):
+    suma = 0
+    ases = 0
+
+    for carta in mano["cartas"]:
+        valor = carta["rank"]
+        if valor in ["J","Q","K"]:
+            suma += 10
+        elif valor == "A":
+            suma += 11
+            ases += 1
+        else:
+            suma += int(valor)
+    while suma > 21 and ases > 0:
+        suma -= 10
+        ases -= 1   
+    mano["puntuacion"] = suma
+    mano["esBlackJack"] = len(mano["cartas"]) == 2 and suma == 21
+    
+def draw(deck):
+    return deck.pop()
 
 class BlackjackGame:
     def __init__(self, jugador, bet):
@@ -98,6 +147,35 @@ class BlackjackGame:
                 self.discordMessage = "Waiting"
             else:
                 self.discordMessage = "You Lost! 🃏"
-    
 
 
+#====================================================================================================
+
+
+async def blackjack(ctx, bet):
+    balance = int(getUser(ctx.author.id)["balance"])
+    file = discord.File("assets/Duala_dealer.webp", filename="Duala_dealer.webp")
+
+    if isinstance(bet, str) and bet.lower() == "allin":
+        bet = balance
+    else:
+        try:
+            bet = int(bet)
+            if bet < 1:
+                return await ctx.send("❌ You must bet at least 1 point.")
+        except ValueError:
+            return await ctx.send("❌ You must enter a number or 'allin'.")
+    if bet > balance:
+        return await ctx.send("❌ Not enough balance.")
+
+    updateUser(ctx.author.id, balance - bet)
+
+    game = BlackjackGame(ctx.author, bet)
+    view = BlackjackView(game)
+    await ctx.send(embed=game.generarEmbed(), view=view, file=file)
+
+    balance += bet
+
+
+async def jackblack(ctx, *, msg):
+    await ctx.send(file=discord.File("assets/jack-black-minecraft.gif"))

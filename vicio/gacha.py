@@ -4,14 +4,19 @@ from typing import ClassVar
 
 import discord
 
-from database.dataBase import *
+from database.dataBase import getUser, updateInventory
 
 from .personajes import personajesComun, personajesEpico, personajesRaro, personajesUncommon
 
 stats = ["ATK", "DEF", "SPE", "LCK", "HP"]
 MAX_LEVEL = 500
 
-
+RANGOS_ENTRENAMIENTO = {
+    "Common": (7, 13),
+    "Uncommon": (3, 7),
+    "Rare": (1, 3),
+    "Epic": (0, 2),
+}
 class RarityConfig:
     DATA: ClassVar[dict] = {
         "Common": {

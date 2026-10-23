@@ -1,9 +1,9 @@
 import discord
 from discord.ui import Button, View
 
-from vicio.gacha import Character
+from vicio.gacha import Character, getInventory
 
-from .bosses import bosses
+from .bosses import bosses, bossHandler
 
 
 class PaginatedView(View):
@@ -91,3 +91,52 @@ class BossListView(PaginatedView):
             text=f"Boss {boss_id} out of {len(self.data)} | Use *boss fight {boss_id} to challenge!"
         )
         return embed, file
+
+
+#====================================================================================================
+
+
+async def inventory(ctx):
+    userID = ctx.author.id
+    inventory = getInventory(userID)
+
+    if not inventory:
+        return await ctx.send("No inventory to show")
+    view = InventoryView(inventory)
+    embed, file = view.get_embed()
+    return await ctx.send(embed=embed, file=file, view=view)
+
+
+async def boss(
+    ctx, option: str | None = None, boss: int | None = None, char: int | None = None
+):
+
+    if not option:
+        return await ctx.send(
+            "Didn't choose an option, either type *boss list or fight <option>"
+        )
+    if option == "list":
+        view = BossListView(bosses)
+        embed, file = view.get_embed()
+        return await ctx.send(embed=embed, file=file, view=view)
+    elif option == "fight":
+        if boss == None or char == None:
+            return await ctx.send(
+                "❌ You need to specify the Boss and your Character. Example: `*boss fight 1 3`"
+            )
+
+        if boss <= 0 or boss > len(bosses):
+            return await ctx.send("❌ That Boss ID doesn't exist.")
+        userID = ctx.author.id
+        inventory = getInventory(userID)
+
+        charPlayer = inventory[char - 1]
+
+        resumen = bossHandler(charPlayer, boss)
+
+        if len(resumen) > 1990:
+            await ctx.send(resumen[:1990] + "...")
+            await ctx.send("..." + resumen[1990:])
+        else:
+            await ctx.send(resumen)
+        return

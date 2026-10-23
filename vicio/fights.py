@@ -1,7 +1,8 @@
 import copy
 import random
+import discord
 
-from .gacha import Character
+from .gacha import Character, getInventory, saveInventory
 
 
 def fight(char1: Character, char2: Character):
@@ -129,3 +130,64 @@ def fight(char1: Character, char2: Character):
             break
 
     return resumen, winner_name
+
+
+#====================================================================================================
+
+
+async def combat(ctx, option: int | None = None, rival: discord.Member | None = None):
+    if not option:
+        return await ctx.send(
+            "You have to choose who you are using in your fight, type *fight <fighter (inventory position)> <rival>"
+        )
+    if not rival:
+        return await ctx.send(
+            "No rival chosen, type *fight <fighter (inventory position)> <rival>"
+        )
+
+    userID = ctx.author.id
+    userInventory = getInventory(userID)
+    rivalInventory = getInventory(rival.id)
+
+    if userInventory == []:
+        return await ctx.send("You don't even have someone to fight with...")
+
+    if rivalInventory == []:
+        return await ctx.send("Your opponent hasn't even someone to defend them...")
+
+    if len(userInventory) < option - 1:
+        return await ctx.send("You don't even have that many characters...")
+
+    userChar = userInventory[option - 1]
+    rivalChar = rivalInventory[0]
+
+    resumen = fight(userChar, rivalChar)
+    if len(resumen) > 1990:
+        await ctx.send(resumen[:1990] + "...")
+        await ctx.send("..." + resumen[1990:])
+    else:
+        await ctx.send(resumen)
+    return
+
+
+async def setDefender(ctx, option: int | None = None):
+
+    if option == None:
+        return await ctx.send(
+            "If you wanna set a defender up you have to type *setDefender <position in your inventory>"
+        )
+
+    userID = ctx.author.id
+    inventory = getInventory(userID)
+
+    if int(option) <= 0 or int(option) > len(inventory):
+        return await ctx.send("You have to select a valid position")
+
+    charDef = inventory[option - 1]
+    aux = inventory[0]
+    inventory[0] = charDef
+    inventory[option - 1] = aux
+
+    saveInventory(userID, inventory)
+
+    return await ctx.send(f"Your defender is now {charDef.name}")

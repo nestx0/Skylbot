@@ -1,15 +1,13 @@
-### Opciones de contenido para Loot Boxes
-
 # Monedas y fichas
 # Boosters temporales
 # Steal Token
 # Rol
-
 # Precio comun: 10k
 
 import random
 
-from vicio.rewards import *
+from vicio.rewards import coinReward
+from database.dataBase import getUser, updateUser
 
 
 def openLootBox():
@@ -30,4 +28,19 @@ def handleLootBox(rarity: str, userID):
     return cuantReward
 
 
-# def handleLootBox(rarity: str, userID):
+#====================================================================================================
+
+
+async def lootbox(ctx):
+    userID = ctx.author.id
+    balance = getUser(userID)["balance"]
+    if balance < 10000:
+        return await ctx.send("Lootboxes cost 10.000 bolivares, try again later❌")
+    else:
+        newBalance = balance - 10000
+        updateUser(userID, newBalance)
+    rarity = openLootBox()
+    cuantReward = handleLootBox(rarity=rarity, userID=userID)
+    return await ctx.send(
+        f"You got a **{rarity}** lootbox, you obtained {cuantReward} bolivares 🐱👤"
+    )
