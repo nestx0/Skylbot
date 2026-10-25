@@ -168,7 +168,7 @@ class PPTInvitation(discord.ui.View):
                     f"{self.challenger.mention}: Waiting for choice\n"
                     f"{self.opponent.mention}: Waiting for choice\n\n"
                     f"Bet: **{self.bet}** each (prize pool: **{2 * self.bet}**).\n"
-                    "Choices stay hidden until both playplayersers have selected."
+                    "Choices stay hidden until both players have selected."
                 ),
                 color=discord.Color.blue(),
             )
