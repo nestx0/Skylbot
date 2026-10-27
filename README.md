@@ -81,6 +81,6 @@ Once the Discord application, database and integrations are configured, run `pyt
 
 ## Contributors
 
-Developed collaboratively by [Alogenes](https://github.com/Alogenes), [nestx0](https://github.com/nestx0), [Parpas16](https://github.com/Parpas16) and . See the [commit history](https://github.com/nestx0/Skylbot/commits/main/) for individual contributions.
+Developed collaboratively by [Alogenes](https://github.com/Alogenes), [nestx0](https://github.com/nestx0), [Oriesu](https://github.com/Oriesu) and [Parpas16](https://github.com/Parpas16). See the [commit history](https://github.com/nestx0/Skylbot/commits/main/) for individual contributions.
 
 Skylbot is a hobby project for exploring Python development, Discord interactions and stateful games.
