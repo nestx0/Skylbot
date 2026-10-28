@@ -233,6 +233,34 @@ def withdrawMoney():
         return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500
 
 
+@app.route("/api/balance/deposit", methods=["POST"])
+def depositMoney():
+    try:
+        data = request.get_json()
+        user_id = data.get("user_id")
+        amount = data.get("amount")
+
+        if not user_id or amount is None:
+            return jsonify({"error": "Faltan datos (user_id o amount)"}), 400
+
+        if amount <= 0:
+            return jsonify({"error": "La cantidad debe ser mayor a 0"}), 400
+
+        user = getUser(user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        balance = int(user["balance"])
+
+        balance += amount
+        updateUser(user_id, balance)
+
+        return jsonify({"nuevo_balance": balance, "status": "ok"}), 200
+
+    except Exception as e:
+        return jsonify({"error": "Error interno del servidor", "details": str(e)}), 500
+
+
 # @app.route("/api/update_user/<int:user_id>", methods=["GET"])
 # def update_balance(user_id):
 #    try:
