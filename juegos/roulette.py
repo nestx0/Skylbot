@@ -1,23 +1,31 @@
 import random
+from pathlib import Path
+
+import discord
+
 from database.dataBase import getUser, updateUser
 
+
 numbas = {
-    "0": "green",   "1": "red",     "2": "black",   "3": "red",     "4": "black",   "5": "red",     "6": "black",
-    "7": "red",     "8": "black",   "9": "red",     "10": "black",  "11": "black",  "12": "red",    "13": "black",
-    "14": "red",    "15": "black",  "16": "red",    "17": "black",  "18": "red",    "19": "red",    "20": "black",
-    "21": "red",    "22": "black",  "23": "red",    "24": "black",  "25": "red",    "26": "black",  "27": "red",
-    "28": "black",  "29": "black",  "30": "red",    "31": "black",  "32": "red",    "33": "black",  "34": "red",
-    "35": "black",  "36": "red"
+    "0": "green", "1": "red", "2": "black", "3": "red", "4": "black", "5": "red", "6": "black",
+    "7": "red", "8": "black", "9": "red", "10": "black", "11": "black", "12": "red", "13": "black",
+    "14": "red", "15": "black", "16": "red", "17": "black", "18": "red", "19": "red", "20": "black",
+    "21": "red", "22": "black", "23": "red", "24": "black", "25": "red", "26": "black", "27": "red",
+    "28": "black", "29": "black", "30": "red", "31": "black", "32": "red", "33": "black", "34": "red",
+    "35": "black", "36": "red"
 }
 
 options = [
-    "red",      "black",    "green",
-    "1st",      "2nd",      "3rd",
-    "half1",    "half2",
+    "red", "black", "green",
+    "1st", "2nd", "3rd",
+    "half1", "half2",
     "numbers",
-    "orphans",  "gserie",   "5/8",
+    "orphans", "gserie", "5/8",
     "zerozone"
 ]
+
+COLOR_DATA = {"red": (0xE74C3C, "🔴"), "black": (0x2B2D31, "⚫"), "green": (0x2ECC71, "🟢")}
+
 
 def getWin(result: int, choice: str, numbers: list | None = None):
     match choice:
@@ -48,8 +56,8 @@ def getWin(result: int, choice: str, numbers: list | None = None):
         case "numbers":
             if numbers is not None:
                 return result in map(int, numbers)
-
     return False
+
 
 def getMultiplier(win: bool, choice: str, numbers: list | None = None):
     if win:
@@ -71,98 +79,85 @@ def getMultiplier(win: bool, choice: str, numbers: list | None = None):
                 return 36 / 7
             case "orphans":
                 return 36 / 8
-    else:
-        return 0
+    return 0
+
 
 def getNumbers():
     return numbas
 
 
-#====================================================================================================
+def _animation_path(color: str) -> Path | None:
+    filename = f"roulette_{color}.webp"
+    for parent in Path(__file__).resolve().parents:
+        path = parent / "assets" / "roulette" / filename
+        if path.is_file():
+            return path
+    return None
+
+
+#========================================================================================================================================
 
 
 async def roulette(ctx, amount, choice=None, *, numbers: str | None = None):
     balance = getUser(ctx.author.id)["balance"]
-    numbas = getNumbers()
+
     if isinstance(amount, str) and amount.lower() == "allin":
         amount = balance
     else:
         try:
             amount = int(amount)
-            if amount < 1:
-                return await ctx.send("❌ You must bet at least 1 point.")
-        except ValueError:
+        except (ValueError, TypeError):
             return await ctx.send("❌ You must enter a number or 'allin'.")
+
+    if amount < 1:
+        return await ctx.send("❌ You must bet at least 1 point.")
     if amount > balance:
         return await ctx.send("❌ Not enough balance.")
 
-    if amount and choice:
-        if choice.lower() not in options:
-            await ctx.send(
-                "Select a valid option: \n *red*, *black*, *green*, \n *1st*, *2nd*, *3rd*, \n *half1*, *half2*, \n *orphans*, *gserie*, *5/8*, *zerozone*, \n *numbers*"
-            )
-            return
-        elif choice != "numbers":
-            result = random.randint(0, 36)
-            updateUser(ctx.author.id, balance - amount)
-            newBalance = getUser(ctx.author.id)["balance"]
+    if not choice or choice.lower() not in options:
+        return await ctx.send(
+            "Select a valid option:\n"
+            "*red*, *black*, *green*,\n"
+            "*1st*, *2nd*, *3rd*,\n"
+            "*half1*, *half2*,\n"
+            "*orphans*, *gserie*, *5/8*, *zerozone*,\n"
+            "*numbers*"
+        )
 
-            win = getWin(result, choice)
+    choice = choice.lower()
+    chosen_numbers = None
+    if choice == "numbers":
+        if not numbers:
+            return await ctx.send("You must provide numbers to bet on when choosing 'numbers'.")
+        try:
+            chosen_numbers = [int(num) for num in numbers.split() if 0 <= int(num) <= 36]
+        except ValueError:
+            return await ctx.send("Please provide numbers only, separated by spaces.")
+        if not chosen_numbers:
+            return await ctx.send("You must provide valid numbers between 0 and 36.")
 
-            mult = getMultiplier(win, choice)
-            assert mult is not None
-            amount = int(amount * mult)
-            updateUser(ctx.author.id, newBalance + amount)
-            if "red" in numbas[str(result)]:
-                decor = "🔴"
-            elif "black" in numbas[str(result)]:
-                decor = "⚫"
-            else:
-                decor = "🟢"
-            if win:
-                await ctx.send(
-                    f"Number chosen was {result} {decor}, you won {amount} bolivares"
-                )
-            else:
-                await ctx.send(
-                    f"Number chosen was {result} {decor}, better luck next time"
-                )
-        else:
-            if not numbers:
-                return await ctx.send(
-                    "You must provide numbers to bet on when choosing 'numeros'"
-                )
-            try:
-                chosen_numbers = [
-                    int(num) for num in numbers.split(" ") if 0 <= int(num) <= 36
-                ]
-                if not chosen_numbers:
-                    return await ctx.send(
-                        "You must provide valid numbers between 0 and 36"
-                    )
-            except ValueError:
-                return await ctx.send(
-                    "Please provide numbers only, separated by spaces"
-                )
+    result = random.randint(0, 36)
+    color = numbas[str(result)]
+    animation = _animation_path(color)
+    if animation is None:
+        return await ctx.send(f"❌ Missing animation: assets/roulette/roulette_{color}.webp")
 
-            result = random.randint(0, 36)
-            updateUser(ctx.author.id, balance - amount)
-            newBalance = getUser(ctx.author.id)["balance"]
-            if "red" in numbas[str(result)]:
-                decor = "🔴"
-            elif "black" in numbas[str(result)]:
-                decor = "⚫"
-            else:
-                decor = "🟢"
+    win = getWin(result, choice, chosen_numbers)
+    multiplier = getMultiplier(win, choice, chosen_numbers)
+    payout = round(amount * multiplier) if choice == "numbers" else int(amount * multiplier)
+    new_balance = balance - amount + payout
+    updateUser(ctx.author.id, new_balance)
 
-            if result in chosen_numbers:
-                mult = 36 / len(chosen_numbers)
-                amount = round(amount * mult)
-                updateUser(ctx.author.id, newBalance + amount)
-                await ctx.send(
-                    f"Number chosen was {result}{decor}, you won {amount} bolivares"
-                )
-            else:
-                await ctx.send(
-                    f"Number chosen was {result}{decor}, better luck next time"
-                )
+    embed_color, symbol = COLOR_DATA[color]
+    embed = discord.Embed(
+        title="Roulette",
+        description=(
+            f"**Number: {result} {symbol}**\n"
+            f"{'You won ' + str(payout) + ' bolivares!' if win else 'Better luck next time!'}"
+        ),
+        color=embed_color,
+    )
+    embed.add_field(name="Bet", value=f"{amount} bolivares", inline=True)
+    embed.add_field(name="Balance", value=f"{new_balance} bolivares", inline=True)
+    embed.set_thumbnail(url=f"attachment://{animation.name}")
+    await ctx.send(embed=embed, file=discord.File(animation, filename=animation.name))
