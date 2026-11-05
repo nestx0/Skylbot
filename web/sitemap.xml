@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://skylbot.example/</loc></url>
-  <url><loc>https://skylbot.example/funciones/</loc></url>
-  <url><loc>https://skylbot.example/comandos/</loc></url>
-  <url><loc>https://skylbot.example/empezar/</loc></url>
-  <url><loc>https://skylbot.example/faq/</loc></url>
-  <url><loc>https://skylbot.example/privacidad/</loc></url>
-  <url><loc>https://skylbot.example/terminos/</loc></url>
-  <url><loc>https://skylbot.example/catpital/</loc></url>
+  <url><loc>https://skylbot.example/index.html</loc></url>
+  <url><loc>https://skylbot.example/funciones/index.html</loc></url>
+  <url><loc>https://skylbot.example/comandos/index.html</loc></url>
+  <url><loc>https://skylbot.example/empezar/index.html</loc></url>
+  <url><loc>https://skylbot.example/faq/index.html</loc></url>
+  <url><loc>https://skylbot.example/privacidad/index.html</loc></url>
+  <url><loc>https://skylbot.example/terminos/index.html</loc></url>
+  <url><loc>https://skylbot.example/catpital/index.html</loc></url>
 </urlset>
