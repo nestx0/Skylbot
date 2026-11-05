@@ -23,7 +23,7 @@ class PlantInventoryView(PaginatedView):
         if item.esSemilla:
             embed.add_field(name="Status", value="🌱 Seed (Ungerminated)", inline=True)
             embed.add_field(
-                name="Action", value="Use `/water` to germinate", inline=False
+                name="Action", value="Use `*water` to germinate", inline=False
             )
         else:
             embed.add_field(name="Level", value=f"Lvl {item.lvl}", inline=True)
