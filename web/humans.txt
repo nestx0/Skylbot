@@ -1,0 +1,3 @@
+Skylbot — sitio web comunitario
+Repositorio del bot: https://github.com/nestx0/Skylbot
+Sin afiliación con Discord Inc.
