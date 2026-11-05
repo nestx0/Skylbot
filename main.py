@@ -12,10 +12,12 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from database.dataBase import *
+from database.plantsDatabase import PlantsDatabase
 from juegos.blackjack.game import blackjack, jackblack
 from juegos.ppt import ppt
 from juegos.roulette import roulette
 from other_commands import *
+from plants.plantsCommands import plantinv, sellplant, shop, water
 from vicio.fights import combat, setDefender
 from vicio.gacha import pullChar
 from vicio.gacha_commands import *
@@ -102,10 +104,18 @@ bot.command(name="leaderboard", help="Get the top 10 members with the most point
 bot.command(name="mine", help="Grab a reward if you're quick enough")(mine)
 bot.command(name="buyRole", help="Secret role for 200k")(buyRole)
 
+# Plants Commands (plants/)
+
+bot.command(name="shop", help="Open the daily seed shop")(shop)
+bot.command(name="plantinv", help="Check your plant inventory")(plantinv)
+bot.command(name="water", help="Water a plant to grow it or germinate a seed")(water)
+bot.command(name="sellplant", help="Sell a plant for bolivares")(sellplant)
+
 
 @bot.event
 async def on_ready():
     change_activity.start()
+    PlantsDatabase.create_table()
     assert bot.user is not None
     print(f"We are ready to go, {bot.user.name}")
 

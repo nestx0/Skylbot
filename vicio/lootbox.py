@@ -6,8 +6,8 @@
 
 import random
 
-from vicio.rewards import coinReward
 from database.dataBase import getUser, updateUser
+from vicio.rewards import coinReward
 
 
 def openLootBox():
@@ -28,7 +28,7 @@ def handleLootBox(rarity: str, userID):
     return cuantReward
 
 
-#====================================================================================================
+# ====================================================================================================
 
 
 async def lootbox(ctx):

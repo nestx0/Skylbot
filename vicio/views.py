@@ -1,3 +1,5 @@
+from typing import Any
+
 import discord
 from discord.ui import Button, View
 
@@ -7,7 +9,7 @@ from .bosses import bosses, bossHandler
 
 
 class PaginatedView(View):
-    def __init__(self, items: list[Character], timeout: int = 90):
+    def __init__(self, items: list[Any], timeout: int = 90):
         super().__init__(timeout=timeout)
         self.data = items
         self.current_page = 0
@@ -17,22 +19,27 @@ class PaginatedView(View):
         self.prev_button.disabled = self.current_page == 0
         self.next_button.disabled = self.current_page >= len(self.data) - 1
 
-    def get_embed(self) -> tuple[discord.Embed, discord.File]:
+    def get_embed(self) -> tuple[discord.Embed, discord.File | None]:
         raise NotImplementedError("Las subclases deben implementar get_embed()")
 
     async def _update_view(self, interaction: discord.Interaction):
         self.update_buttons()
         embed, file = self.get_embed()
-        await interaction.response.edit_message(
-            embed=embed, attachments=[file], view=self
-        )
 
-    @discord.ui.button(label="◀ Previous", style=discord.ButtonStyle.primary)
+        kwargs = {"embed": embed, "view": self}
+        if file:
+            kwargs["attachments"] = [file]
+        else:
+            kwargs["attachments"] = []
+
+        await interaction.response.edit_message(**kwargs)
+
+    @discord.ui.button(label="◀ Previous", style=discord.ButtonStyle.primary, row=1)
     async def prev_button(self, interaction: discord.Interaction, button: Button):
         self.current_page -= 1
         await self._update_view(interaction)
 
-    @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Next ▶", style=discord.ButtonStyle.primary, row=1)
     async def next_button(self, interaction: discord.Interaction, button: Button):
         self.current_page += 1
         await self._update_view(interaction)
