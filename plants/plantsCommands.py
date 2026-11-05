@@ -66,7 +66,7 @@ async def water(ctx, pos: int | None = None):
         PlantsDatabase.updateInventory(user_id=userID, inventory_list=inv.toDict())
 
         return await ctx.send(
-            f"🌱 Your seed bloomed into a **{planta_nueva.nombre}**! Check it in your `/plantinv`."
+            f"🌱 Your seed bloomed into a **{planta_nueva.nombre}**! Check it in your `*plantinv`."
         )
 
     elif isinstance(item, Planta):
