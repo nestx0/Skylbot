@@ -3,7 +3,7 @@ import random
 
 RARITIES = ["Common", "Uncommon", "Rare", "Epic"]
 WEIGHTS = [60, 25, 10, 5]
-MAX_VALUE = 500000
+MAX_VALUE = 250000
 MAX_INVENTORY = 20
 MIN_MULT = 1.3
 MAX_MULT = 1.8
