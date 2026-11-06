@@ -40,22 +40,25 @@ async def pull(ctx, quantity: int | None = None):
         updateUser(userID, balance)
 
         nuevos = []
-        repes = []
+        repes = {}
 
         for _ in range(quantity):
             char = pullChar(userID)
-            if char.level > 1:
-                repes.append(f"{char.name} ({char.rarity})")
-            else:
-                nuevos.append(f"{char.name} ({char.rarity})")
+            char_format = f"{char.name} ({char.rarity})"
 
-        # Construimos el mensaje final dinámicamente
+            if char.level > 1:
+                repes[char_format] = repes.get(char_format, 0) + 1
+            else:
+                nuevos.append(char_format)
+
         final_mensaje = "You got the following characters:\n"
 
-        if nuevos:  # Si la lista tiene elementos, los unimos con comas
+        if nuevos:
             final_mensaje += f"**NEW:** {', '.join(nuevos)}\n"
+
         if repes:
-            final_mensaje += f"**Repeated:** {', '.join(repes)}\n"
+            repes_str = [f"{nombre} x{cantidad}" for nombre, cantidad in repes.items()]
+            final_mensaje += f"**Repeated:** {', '.join(repes_str)}\n"
 
         await ctx.send(final_mensaje)
 

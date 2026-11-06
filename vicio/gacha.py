@@ -6,7 +6,12 @@ import discord
 
 from database.dataBase import getUser, updateInventory
 
-from .personajes import personajesComun, personajesEpico, personajesRaro, personajesUncommon
+from .personajes import (
+    personajesComun,
+    personajesEpico,
+    personajesRaro,
+    personajesUncommon,
+)
 
 stats = ["ATK", "DEF", "SPE", "LCK", "HP"]
 MAX_LEVEL = 500
@@ -17,6 +22,8 @@ RANGOS_ENTRENAMIENTO = {
     "Rare": (1, 3),
     "Epic": (0, 2),
 }
+
+
 class RarityConfig:
     DATA: ClassVar[dict] = {
         "Common": {

@@ -1,6 +1,8 @@
 import asyncio
 import os
+
 from zai import ZhipuAiClient
+
 from ai.colaIA import GlobalQueue, TextBlock
 
 prompt_inicial = """
@@ -35,10 +37,12 @@ history = GlobalQueue()
 client = ZhipuAiClient(api_key=aiKey)
 model = "glm-5.3-flash"
 
+
 async def clear(ctx):
     user_name = ctx.author.display_name
     history.clear(user_name)
     await ctx.send("All done !")
+
 
 async def ai(ctx, *, mensaje: str):
     try:
