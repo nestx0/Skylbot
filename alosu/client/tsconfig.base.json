@@ -1,0 +1,106 @@
+{
+  "compilerOptions": {
+    // Target and Module Configuration
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
+    "moduleResolution": "Bundler",
+    
+    // Strict Type Checking Options
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    
+    // Additional Checks
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false, // Allow bracket notation for env vars
+    
+    // Module Resolution
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": false,
+    "allowArbitraryExtensions": false,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    
+    // Interop Constraints
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Type Checking
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": false,
+    
+    // Advanced Options
+    "preserveConstEnums": true,
+    "preserveValueImports": false,
+    
+    // Path mapping for modular architecture
+    "baseUrl": ".",
+    "paths": {
+      // Core module paths
+      "@/*": ["src/*"],
+      "@/core": ["src/core/index.ts"],
+      "@/core/*": ["src/core/*"],
+      "@/platform": ["src/core/platform.ts"],
+      
+      // Game module paths
+      "@/games": ["src/games/index.ts"],
+      "@/games/*": ["src/games/*"],
+      "@/games/base": ["src/games/base/BaseGame.ts"],
+      "@/games/blackjack": ["src/games/blackjack/index.ts"],
+      "@/games/gacha": ["src/games/gacha/index.ts"],
+      "@/games/rocket": ["src/games/rocket/index.ts"],
+      
+      // Shared module paths
+      "@/shared": ["src/shared/index.ts"],
+      "@/shared/*": ["src/shared/*"],
+      "@/components": ["src/shared/components/index.ts"],
+      "@/utils": ["src/shared/utils/index.ts"],
+      "@/constants": ["src/shared/constants/index.ts"],
+      
+      // Asset paths
+      "@/assets": ["src/assets/index.ts"],
+      "@/assets/*": ["src/assets/*"],
+      "@/styles": ["src/assets/styles/index.ts"],
+      
+      // Configuration paths
+      "@/config": ["src/config/index.ts"],
+      "@/config/*": ["src/config/*"],
+      
+      // Type definitions
+      "@/types": ["src/core/types/index.ts"],
+      "@/types/*": ["src/core/types/*"],
+      
+      // Service paths
+      "@/services": ["src/core/services/index.ts"],
+      "@/services/*": ["src/core/services/*"],
+      
+      // Manager paths
+      "@/managers": ["src/core/managers/index.ts"],
+      "@/audio": ["src/core/audio-manager/index.ts"],
+      "@/styles-manager": ["src/core/style-manager/index.ts"],
+      "@/plugin-manager": ["src/core/plugin-manager/index.ts"],
+      "@/router": ["src/core/router/index.ts"],
+      "@/discord": ["src/core/discord-sdk/index.ts"]
+    },
+    
+    // Type roots for better type resolution
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types",
+      "./src/core/types"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // Build-specific options
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "inlineSourceMap": false,
+    "outDir": "./dist",
+    "removeComments": true,
+    "importHelpers": true,
+    
+    // Optimization for production builds
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "preserveConstEnums": false,
+    
+    // Enhanced type checking for builds
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true
+  },
+  
+  "include": [
+    "src/**/*",
+    "src/**/*.json",
+    "config/**/*"
+  ],
+  
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.property.test.ts",
+    "test/**/*",
+    "tests/**/*",
+    "src/test/**/*"
+  ]
+}

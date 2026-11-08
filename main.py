@@ -26,15 +26,15 @@ from vicio.views import boss, inventory
 
 app = Flask(__name__)
 CORS(app)
-
 load_dotenv()
+
 from ai.ai_funcions import ai, clear
+from alosu import register_alosu
 
+register_alosu(app)
 token = os.getenv("DISCORD_TOKEN")
-
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
 lastTimeGIF = 0
-
 tiempo_of_las_mio = 0
 
 activities = itertools.cycle(

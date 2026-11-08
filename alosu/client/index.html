@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discord Activity Platform</title>
+    
+    <!-- Performance optimizations -->
+    <meta name="theme-color" content="#5865F2" />
+    <meta name="description" content="Discord Activity multi-game platform with modular architecture" />
+    
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://discord.com" />
+    <link rel="dns-prefetch" href="https://discord.com" />
+    
+    <!-- Resource hints for critical resources (will be updated by build process) -->
+    <!-- These will be dynamically generated based on the build configuration -->
+    
+    <!-- Critical CSS will be inlined here in production -->
+    <style id="critical-css">
+      /* Critical CSS will be inlined here during build */
+      body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      #app { width: 100vw; height: 100vh; }
+      .loading { display: flex; align-items: center; justify-content: center; height: 100vh; }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Loading fallback -->
+      <div class="loading">
+        <div>Loading Discord Activity Platform...</div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

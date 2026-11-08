@@ -1,0 +1,40 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // Development-specific options
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    "inlineSourceMap": false,
+    "outDir": "./dist",
+    "removeComments": false,
+    "importHelpers": true
+  },
+  
+  // Files to include in compilation
+  "include": [
+    "src/main.ts", "src/discordSdk.ts", "src/game.ts", "src/game2.ts", "src/gachaGame.ts",
+    "src/api.ts", "src/utils/auth.ts", "src/utils/api.ts", "src/utils/logger.ts",
+    "src/types/**/*.ts", "src/vite-env.d.ts", "vite.config.ts"
+  ],
+
+  // Files to exclude from compilation
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.property.test.ts",
+    "test/**/*",
+    "tests/**/*"
+  ],
+  
+  // TypeScript 5.0+ options for better performance and type safety
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
+}
