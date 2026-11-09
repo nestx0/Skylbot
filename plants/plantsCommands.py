@@ -42,51 +42,80 @@ async def plantinv(ctx):
     return await ctx.send(**kwargs)
 
 
-async def water(ctx, pos: int | None = None):
+async def water(ctx, pos=None):
     if pos is None:
-        return await ctx.send("Syntax: `water <slot>` (Example: `water 1`)")
+        return await ctx.send(
+            "Syntax: `water <slot>` (Example: `water 1` or `water all`)"
+        )
 
     userID = ctx.author.id
-    actualPos = pos - 1
-
     rawInv = PlantsDatabase.getInventory(userID)
     inv = Inventario()
     inv.load(rawInv)
 
-    if actualPos < 0 or actualPos >= len(inv.inventory):
-        return await ctx.send(
-            f"Invalid position. Choose between 1 and {len(inv.inventory)}."
-        )
+    if not inv.inventory:
+        return await ctx.send("Your inventory is empty.")
 
-    item = inv.inventory[actualPos]
+    if str(pos).lower() == "all":
+        indices_a_procesar = range(len(inv.inventory))
+    else:
+        try:
+            actualPos = int(pos) - 1
+        except ValueError:
+            return await ctx.send("Invalid position. Please provide a number or 'all'.")
 
-    if isinstance(item, Semilla):
-        planta_nueva = item.germinar()
-        inv.inventory[actualPos] = planta_nueva
+        if actualPos < 0 or actualPos >= len(inv.inventory):
+            return await ctx.send(
+                f"Invalid position. Choose between 1 and {len(inv.inventory)}."
+            )
+
+        indices_a_procesar = [actualPos]
+
+    mensajes = []
+    hoy = datetime.date.today()
+    inventario_modificado = False
+
+    for i in indices_a_procesar:
+        item = inv.inventory[i]
+
+        if isinstance(item, Planta):
+            if item.lastTimeWater == hoy:
+                mensajes.append(
+                    f"💧 You have already watered **{item.nombre}** today. Come back tomorrow!"
+                )
+                continue  # Evita que la planta crezca si ya fue regada hoy
+
+            if item.grow():
+                inv.inventory[i] = item
+                inventario_modificado = True
+                mensajes.append(
+                    f"✨ You watered **{item.nombre}**! It leveled up to **Lvl {item.lvl}** (Value: 🪙 {item.value:,})."
+                )
+            else:
+                mensajes.append(
+                    f"🏆 **{item.nombre}** has already reached its maximum value (🪙 250,000)!"
+                )
+
+        elif isinstance(item, Semilla):
+            planta_nueva = item.germinar()
+            inv.inventory[i] = planta_nueva
+            inventario_modificado = True
+            mensajes.append(
+                f"🌱 Your seed bloomed into a **{planta_nueva.nombre}**! Check it in your `*plantinv`."
+            )
+
+    if inventario_modificado:
         PlantsDatabase.updateInventory(user_id=userID, inventory_list=inv.toDict())
 
-        return await ctx.send(
-            f"🌱 Your seed bloomed into a **{planta_nueva.nombre}**! Check it in your `*plantinv`."
-        )
+    if mensajes:
+        final_msg = "\n".join(mensajes)
 
-    elif isinstance(item, Planta):
-        hoy = datetime.date.today()
+        if len(final_msg) > 1950:
+            final_msg = final_msg[:1950] + "\n... (Message truncated, too many plants!)"
 
-        if item.lastTimeWater == hoy:
-            return await ctx.send(
-                "💧 You have already watered this plant today. Come back tomorrow!"
-            )
-
-        if item.grow():
-            inv.inventory[actualPos] = item
-            PlantsDatabase.updateInventory(user_id=userID, inventory_list=inv.toDict())
-            return await ctx.send(
-                f"✨ You watered **{item.nombre}**! It leveled up to **Lvl {item.lvl}** (Value: 🪙 {item.value:,})."
-            )
-        else:
-            return await ctx.send(
-                "🏆 This plant has already reached its maximum value (🪙 500,000)!"
-            )
+        return await ctx.send(final_msg)
+    else:
+        return await ctx.send("No actions could be performed.")
 
 
 async def sellplant(ctx, pos: int | None = None):
