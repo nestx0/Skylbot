@@ -1,10 +1,7 @@
-"""Shared parsing for all/max amounts and inventory selections."""
-
 MAX_ALIASES = frozenset({"all", "max"})
 
 
 def parse_amount(value: str | int, available: int, *, allow_allin: bool = False) -> int:
-    """Resolve an amount; 'allin' is only accepted when betting."""
     token = str(value).strip().lower()
     if token in MAX_ALIASES or (allow_allin and token == "allin"):
         return available
@@ -18,7 +15,6 @@ def parse_amount(value: str | int, available: int, *, allow_allin: bool = False)
 
 
 def parse_positions(text: str, inventory_length: int) -> tuple[list[int], bool]:
-    """Unique sorted 1-based slots; second result is True for all/max."""
     parts = text.strip().split()
     if not parts:
         raise ValueError("Choose at least one inventory slot.")
