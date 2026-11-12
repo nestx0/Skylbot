@@ -30,7 +30,7 @@ async def pull(ctx, quantity: int | None = None):
 
         await ctx.send(mensaje)
 
-    elif quantity > 1:
+    elif quantity >= 1:
         if balance < PULL_PRICE * quantity:
             return await ctx.send(
                 f"You need {PULL_PRICE * quantity} bolivares to pull {quantity} characters"
