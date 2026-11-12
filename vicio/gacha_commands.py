@@ -1,102 +1,101 @@
 import discord
 from discord.ext import commands
 
+from command_utils import parse_amount, parse_positions
 from database.dataBase import getUser, updateUser
 
 from .gacha import *
 
 
-async def pull(ctx, quantity: int | None = None):
+async def pull(ctx, quantity: str | None = None):
     userID = ctx.author.id
     balance = int(getUser(userID)["balance"])
     PULL_PRICE = 3000
     char = None
 
-    if balance < PULL_PRICE:
-        return await ctx.send("To pull a character, you need 3000 bolivares")
+    if quantity is None:
+        count = 1
+    else:
+        try:
+            count = parse_amount(quantity, balance // PULL_PRICE)
+        except ValueError as exc:
+            return await ctx.send(str(exc))
+
+    if count < 1:
+        return await ctx.send("Quantity must be at least 1.")
+    if balance < PULL_PRICE * count:
+        return await ctx.send(
+            f"You need {PULL_PRICE * count} bolivares to pull {count} characters"
+        )
 
     print(f"Haciendo pull para {ctx.author.display_name}...")
-    if quantity == None:
-        balance -= PULL_PRICE
-        updateUser(userID, balance)
+    balance -= PULL_PRICE * count
+    updateUser(userID, balance)
 
+    if count == 1:
         char = pullChar(userID)
         if char.level > 1:
             mensaje = f"♻️ **Repeated!** You already had a **{char.name}**. It leveled up to **{char.level}**! ⬆️"
         else:
-            mensaje = (
-                f"✨ **Congrats!** You got a new **{char.name}** ({char.rarity}) 🙀"
-            )
-
+            mensaje = f"✨ **Congrats!** You got a new **{char.name}** ({char.rarity}) 🙀"
         await ctx.send(mensaje)
 
-    elif quantity >= 1:
-        if balance < PULL_PRICE * quantity:
-            return await ctx.send(
-                f"You need {PULL_PRICE * quantity} bolivares to pull {quantity} characters"
-            )
+        embed = char.toEmbed()
+        archivo = discord.File(char.image, filename="char.webp")
+        embed.set_image(url="attachment://char.webp")
+        return await ctx.send(file=archivo, embed=embed)
 
-        balance -= PULL_PRICE * quantity
-        updateUser(userID, balance)
+    nuevos = []
+    repes = {}
+    for _ in range(count):
+        char = pullChar(userID)
+        char_format = f"{char.name} ({char.rarity})"
+        if char.level > 1:
+            repes[char_format] = repes.get(char_format, 0) + 1
+        else:
+            nuevos.append(char_format)
 
-        nuevos = []
-        repes = {}
-
-        for _ in range(quantity):
-            char = pullChar(userID)
-            char_format = f"{char.name} ({char.rarity})"
-
-            if char.level > 1:
-                repes[char_format] = repes.get(char_format, 0) + 1
+    # Split long summaries into multiple messages instead of limiting pull quantity.
+    message = f"You pulled {count} characters:\n"
+    for heading, entries in (
+        ("NEW", nuevos),
+        ("Repeated", [f"{name} x{times}" for name, times in repes.items()]),
+    ):
+        if not entries:
+            continue
+        prefix = f"**{heading}:** "
+        if len(message) + len(prefix) > 1900:
+            await ctx.send(message)
+            message = ""
+        message += prefix
+        for index, item in enumerate(entries):
+            segment = (", " if index else "") + item
+            if len(message) + len(segment) > 1900:
+                await ctx.send(message)
+                message = f"**{heading} (cont.):** {item}"
             else:
-                nuevos.append(char_format)
-
-        final_mensaje = "You got the following characters:\n"
-
-        if nuevos:
-            final_mensaje += f"**NEW:** {', '.join(nuevos)}\n"
-
-        if repes:
-            repes_str = [f"{nombre} x{cantidad}" for nombre, cantidad in repes.items()]
-            final_mensaje += f"**Repeated:** {', '.join(repes_str)}\n"
-
-        await ctx.send(final_mensaje)
-
-    else:
-        return await ctx.send("Quantity must be at least 1.")
-
-    assert char is not None
-    embed = char.toEmbed()
-    archivo = discord.File(char.image, filename="char.webp")
-
-    embed.set_image(url="attachment://char.webp")
-    return await ctx.send(file=archivo, embed=embed)
+                message += segment
+        message += "\n"
+    return await ctx.send(message)
 
 
 async def sell(ctx, *, option: str | None = None):
     if not option:
         return await ctx.send("You have to choose at least one slot in your inventory.")
-    try:
-        positions = {int(num) for num in option.split()}
-    except ValueError:
-        return await ctx.send(
-            "Error: Enter numbers separated by spaces. Example: *sell 1 2 3"
-        )
 
     userID = ctx.author.id
     inventory = getInventory(userID)
-
     if not inventory:
         return await ctx.send("Your inventory is empty.")
-    if any(pos < 1 or pos > len(inventory) for pos in positions):
-        return await ctx.send(
-            f"Invalid position. Choose between 1 and {len(inventory)}."
-        )
+    try:
+        positions, _ = parse_positions(option, len(inventory))
+    except ValueError as exc:
+        return await ctx.send(str(exc))
 
-    selected = [inventory[pos - 1] for pos in sorted(positions)]
+    selected = [inventory[pos - 1] for pos in positions]
     total_reward = sum(char.getSellValue() for char in selected)
 
-    for pos in sorted(positions, reverse=True):
+    for pos in reversed(positions):
         inventory.pop(pos - 1)
 
     balance = int(getUser(userID)["balance"])
@@ -104,11 +103,14 @@ async def sell(ctx, *, option: str | None = None):
     saveInventory(userID, inventory)
     updateUser(userID, new_balance)
     names = ", ".join(char.name for char in selected)
-
-    return await ctx.send(
+    msg = (
         f"You sold **{names}** for **{total_reward} bolivares**. "
         f"Your new balance is **{new_balance}**."
     )
+    if len(msg) > 1900:
+        msg = (f"You sold **{len(selected)}** characters for **{total_reward} bolivares**. "
+               f"Your new balance is **{new_balance}**.")
+    return await ctx.send(msg)
 
 
 @commands.cooldown(1, 3600, commands.BucketType.user)

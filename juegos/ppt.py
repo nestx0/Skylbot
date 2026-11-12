@@ -1,5 +1,6 @@
 import asyncio
 import random
+from command_utils import parse_amount
 import discord
 
 from discord.ext import commands
@@ -213,7 +214,7 @@ class PPTInvitation(discord.ui.View):
 
 async def ppt(ctx, *args: str):
     if len(args) not in (1, 2):
-        return await ctx.send("Usage: `*ppt <amount|allin>` or `*ppt @user <amount|allin>`")
+        return await ctx.send("Usage: `*ppt <amount|all|max|allin>` or `*ppt @user <amount|all|max|allin>`")
 
     opponent = None
     if len(args) == 2:
@@ -226,9 +227,9 @@ async def ppt(ctx, *args: str):
 
     balance = int(getUser(ctx.author.id)["balance"])
     try:
-        bet = balance if args[-1].lower() == "allin" else int(args[-1])
-    except ValueError:
-        return await ctx.send("Enter a number or 'allin'.")
+        bet = parse_amount(args[-1], balance, allow_allin=True)
+    except ValueError as exc:
+        return await ctx.send(str(exc))
     if bet < 1:
         return await ctx.send("You must bet at least 1 bolivar.")
     if bet > balance:

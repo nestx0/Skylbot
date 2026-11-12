@@ -1,6 +1,7 @@
 import random
 from pathlib import Path
 
+from command_utils import parse_amount
 import discord
 
 from database.dataBase import getUser, updateUser
@@ -101,13 +102,10 @@ def _animation_path(color: str) -> Path | None:
 async def roulette(ctx, amount, choice=None, *, numbers: str | None = None):
     balance = getUser(ctx.author.id)["balance"]
 
-    if isinstance(amount, str) and amount.lower() == "allin":
-        amount = balance
-    else:
-        try:
-            amount = int(amount)
-        except (ValueError, TypeError):
-            return await ctx.send("❌ You must enter a number or 'allin'.")
+    try:
+        amount = parse_amount(amount, balance, allow_allin=True)
+    except ValueError as exc:
+        return await ctx.send(f"❌ {exc}")
 
     if amount < 1:
         return await ctx.send("❌ You must bet at least 1 point.")

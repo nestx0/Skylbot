@@ -2,6 +2,7 @@ import asyncio
 import copy
 import random
 
+from command_utils import parse_amount
 import discord
 from discord.ext import commands
 
@@ -408,7 +409,7 @@ class CombatInvitation(PPTInvitation):
 async def combat(ctx, *args: str):
     if len(args) != 3:
         return await ctx.send(
-            "Usage: `*combat @rival <amount|allin> <your_character_position>`"
+            "Usage: `*combat @rival <amount|all|max|allin> <your_character_position>`"
         )
 
     try:
@@ -435,9 +436,9 @@ async def combat(ctx, *args: str):
     challenger_char = userInventory[char_pos - 1]
     balance = int(getUser(userID)["balance"])
     try:
-        bet = balance if args[1].lower() == "allin" else int(args[1])
-    except ValueError:
-        return await ctx.send("Enter a number or 'allin'.")
+        bet = parse_amount(args[1], balance, allow_allin=True)
+    except ValueError as exc:
+        return await ctx.send(str(exc))
     if bet < 1:
         return await ctx.send("You must bet at least 1 bolivar.")
     if bet > balance:

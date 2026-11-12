@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 from jokeapi import Jokes
 
+from command_utils import parse_amount
 from database.dataBase import getLeaderboard, getUser, updateUser
 
 intents = discord.Intents.default()
@@ -18,7 +19,7 @@ mio_estado = {"activo": False, "reclamado": False}
 async def guide(ctx):
 
     lines = []
-    for cmd in bot.commands:
+    for cmd in sorted(bot.commands, key=lambda cmd: cmd.name.lower()):
         signature = f"{cmd.signature}" if cmd.signature else ""
         description = cmd.help or "No description yet"
         lines.append(f"• **{cmd.name} {signature}** -   {description}")
@@ -83,22 +84,25 @@ async def work(ctx):
     await ctx.send(f"You've earned {reward}, your balance is {newBalance}")
 
 
-async def pay(ctx, member: discord.Member, amount: int):
+async def pay(ctx, member: discord.Member, amount: str):
     user_id = member.id
     balance = getUser(ctx.author.id)["balance"]
 
+    try:
+        amount = parse_amount(amount, balance)
+    except ValueError as exc:
+        return await ctx.send(str(exc))
+
     if user_id == ctx.author.id or amount < 1:
-        await ctx.send("How are you supposed to do that")
-        return
+        return await ctx.send("How are you supposed to do that")
 
     if balance < amount:
-        await ctx.send(f"You're poor, your maximum balance is {balance}")
-    else:
-        balance -= amount
-        otherBalance = getUser(user_id)["balance"]
-        updateUser(ctx.author.id, balance)
-        updateUser(user_id, otherBalance + amount)
-        await ctx.send(f"Succesfully sent {amount} to {member.display_name}")
+        return await ctx.send(f"You're poor, your maximum balance is {balance}")
+
+    otherBalance = getUser(user_id)["balance"]
+    updateUser(ctx.author.id, balance - amount)
+    updateUser(user_id, otherBalance + amount)
+    await ctx.send(f"Succesfully sent {amount} to {member.display_name}")
 
 
 async def balance(ctx):

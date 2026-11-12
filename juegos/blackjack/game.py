@@ -1,3 +1,4 @@
+from command_utils import parse_amount
 import discord
 import random
 
@@ -156,15 +157,12 @@ async def blackjack(ctx, bet):
     balance = int(getUser(ctx.author.id)["balance"])
     file = discord.File("assets/Duala_dealer.webp", filename="Duala_dealer.webp")
 
-    if isinstance(bet, str) and bet.lower() == "allin":
-        bet = balance
-    else:
-        try:
-            bet = int(bet)
-            if bet < 1:
-                return await ctx.send("❌ You must bet at least 1 point.")
-        except ValueError:
-            return await ctx.send("❌ You must enter a number or 'allin'.")
+    try:
+        bet = parse_amount(bet, balance, allow_allin=True)
+    except ValueError as exc:
+        return await ctx.send(f"❌ {exc}")
+    if bet < 1:
+        return await ctx.send("❌ You must bet at least 1 point.")
     if bet > balance:
         return await ctx.send("❌ Not enough balance.")
 

@@ -1,5 +1,6 @@
 import datetime
 
+from command_utils import parse_positions
 from database.dataBase import getUser, updateUser
 from database.plantsDatabase import PlantsDatabase
 from plants.plantObjects import Inventario, Planta, Semilla
@@ -42,10 +43,10 @@ async def plantinv(ctx):
     return await ctx.send(**kwargs)
 
 
-async def water(ctx, pos=None):
-    if pos is None:
+async def water(ctx, *, pos: str | None = None):
+    if not pos:
         return await ctx.send(
-            "Syntax: `water <slot>` (Example: `water 1` or `water all`)"
+            "Syntax: `water <slot ... | all | max>` (Example: `water 1 3` or `water all`)"
         )
 
     userID = ctx.author.id
@@ -56,20 +57,12 @@ async def water(ctx, pos=None):
     if not inv.inventory:
         return await ctx.send("Your inventory is empty.")
 
-    if str(pos).lower() == "all":
-        indices_a_procesar = range(len(inv.inventory))
-    else:
-        try:
-            actualPos = int(pos) - 1
-        except ValueError:
-            return await ctx.send("Invalid position. Please provide a number or 'all'.")
+    try:
+        positions, _ = parse_positions(pos, len(inv.inventory))
+    except ValueError as exc:
+        return await ctx.send(str(exc))
 
-        if actualPos < 0 or actualPos >= len(inv.inventory):
-            return await ctx.send(
-                f"Invalid position. Choose between 1 and {len(inv.inventory)}."
-            )
-
-        indices_a_procesar = [actualPos]
+    indices_a_procesar = [position - 1 for position in positions]
 
     mensajes = []
     hoy = datetime.date.today()
@@ -118,34 +111,50 @@ async def water(ctx, pos=None):
         return await ctx.send("No actions could be performed.")
 
 
-async def sellplant(ctx, pos: int | None = None):
-    if pos is None:
-        return await ctx.send("Syntax: `sell <slot>` (Example: `sell 1`)")
+async def sellplant(ctx, *, pos: str | None = None):
+    if not pos:
+        return await ctx.send(
+            "Syntax: `sellplant <slot ... | all | max>` (Example: `sellplant 1 3` or `sellplant all`)"
+        )
 
     userID = ctx.author.id
-    actualPos = pos - 1
-
     rawInv = PlantsDatabase.getInventory(userID)
     inv = Inventario()
     inv.load(rawInv)
 
-    if actualPos < 0 or actualPos >= len(inv.inventory):
-        return await ctx.send(
-            f"Invalid position. Choose between 1 and {len(inv.inventory)}."
-        )
+    if not inv.inventory:
+        return await ctx.send("Your inventory is empty.")
 
-    item = inv.inventory[actualPos]
-    if isinstance(item, Semilla):
+    try:
+        positions, all_selected = parse_positions(pos, len(inv.inventory))
+    except ValueError as exc:
+        return await ctx.send(str(exc))
+
+    if all_selected:
+        # Leave seeds in the inventory: they cannot be sold.
+        positions = [p for p in positions if isinstance(inv.inventory[p - 1], Planta)]
+    elif any(isinstance(inv.inventory[p - 1], Semilla) for p in positions):
         return await ctx.send("You cannot sell a seed, water it first")
 
-    elif isinstance(item, Planta):
-        value = item.value
-        balance = getUser(userID)["balance"]
-        balance += value
-        updateUser(userID, balance)
-        inv.inventory.pop(actualPos)
-        PlantsDatabase.updateInventory(userID, inv.toDict())
-        return await ctx.send(
-            f"Done! You sold your **{item.nombre}** for **{value:,}** bolivares. "
+    if not positions:
+        return await ctx.send("You have no grown plants to sell.")
+
+    selected = [inv.inventory[p - 1] for p in positions]
+    value = sum(item.value for item in selected)
+    for p in reversed(positions):
+        inv.inventory.pop(p - 1)
+
+    balance = getUser(userID)["balance"] + value
+    updateUser(userID, balance)
+    PlantsDatabase.updateInventory(userID, inv.toDict())
+    names = ", ".join(item.nombre for item in selected)
+    msg = (
+        f"Done! You sold **{names}** for **{value:,}** bolivares. "
+        f"Your new balance is **{balance:,}**."
+    )
+    if len(msg) > 1900:
+        msg = (
+            f"Done! You sold **{len(selected)}** plants for **{value:,}** bolivares. "
             f"Your new balance is **{balance:,}**."
         )
+    return await ctx.send(msg)

@@ -137,6 +137,9 @@ async def boss(
         userID = ctx.author.id
         inventory = getInventory(userID)
 
+        if char < 1 or char > len(inventory):
+            return await ctx.send("❌ Invalid character position.")
+
         charPlayer = inventory[char - 1]
 
         resumen, _ = bossHandler(charPlayer, boss)
