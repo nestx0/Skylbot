@@ -111,6 +111,102 @@ bot.command(name="plantinv", help="Check your plant inventory")(plantinv)
 bot.command(name="water", help="Water a plant to grow it or germinate a seed")(water)
 bot.command(name="sellplant", help="Sell a plant for bolivares")(sellplant)
 
+COMMAND_HELP = {
+    "ai": "Ask Skylbot a question.\nUsage: *ai <question>\nExample: *ai What is a black hole?",
+    "balance": "Check your current balance.\nUsage: *balance",
+    "blackjack": (
+        "Play Blackjack with a bet.\n"
+        "Usage: *blackjack <amount|all|max|allin>\n"
+        "Examples: *blackjack 100 | *blackjack allin\n"
+        "all, max and allin bet your entire available balance."
+    ),
+    "boss": (
+        "Browse bosses or fight one with your character.\n"
+        "Usage: *boss list | *boss fight <boss_slot> <character_slot>\n"
+        "Examples: *boss list | *boss fight 1 2"
+    ),
+    "buyRole": "Purchase the secret role for 200,000 bolivares.\nUsage: *buyRole",
+    "clear": "Clear Skylbot's current AI conversation context.\nUsage: *clear",
+    "combat": (
+        "Challenge another member to character combat.\n"
+        "Usage: *combat @member <amount|all|max|allin> <character_slot>\n"
+        "Examples: *combat @friend 100 1 | *combat @friend allin 1\n"
+        "all, max and allin use your full available balance as the bet."
+    ),
+    "guide": "Show an alphabetically sorted command summary.\nUsage: *guide\nFor detailed help, use *help <command>.",
+    "inventory": "Browse your character inventory.\nUsage: *inventory\nThe displayed pages show slot positions.",
+    "jackblack": "Send a Jack Black GIF.\nUsage: *jackblack <text>\nExample: *jackblack hi",
+    "joke": "Get a random joke.\nUsage: *joke",
+    "leaderboard": "Show the ten richest members.\nUsage: *leaderboard",
+    "lootbox": "Open a lootbox for 10,000 bolivares.\nUsage: *lootbox",
+    "mine": "Claim a temporary free reward when it appears.\nUsage: *mine",
+    "pay": (
+        "Transfer bolivares to another member.\n"
+        "Usage: *pay @member <amount|all|max>\n"
+        "Examples: *pay @friend 100 | *pay @friend all | *pay @friend max\n"
+        "all and max transfer your entire available balance."
+    ),
+    "ping": "Check whether Skylbot responds.\nUsage: *ping",
+    "plantinv": "Browse your plant and seed inventory.\nUsage: *plantinv",
+    "poll": "Create a poll with reaction options.\nUsage: *poll <question>\nExample: *poll Should we play tonight?",
+    "ppt": (
+        "Play Rock, Paper, Scissors, solo or against another member.\n"
+        "Usage: *ppt <amount|all|max|allin>\n"
+        "       *ppt @member <amount|all|max|allin>\n"
+        "Examples: *ppt 100 | *ppt @friend allin\n"
+        "all, max and allin bet your entire available balance."
+    ),
+    "pull": (
+        "Get random collectible characters for 3,000 bolivares per pull.\n"
+        "Usage: *pull [quantity|all|max]\n"
+        "Examples: *pull | *pull 1 | *pull 10 | *pull all | *pull max\n"
+        "Without arguments, pulls once. all and max use as many pulls as you can afford."
+    ),
+    "roulette": (
+        "Bet on a roulette result.\n"
+        "Usage: *roulette <amount|all|max|allin> <choice> [numbers]\n"
+        "Examples: *roulette 100 red | *roulette max black | *roulette 100 numbers 7 12 20\n"
+        "Choices: red, black, green, 1st, 2nd, 3rd, half1, half2, "
+        "orphans, gserie, 5/8, zerozone, numbers.\n"
+        "all, max and allin bet your entire available balance."
+    ),
+    "sell": (
+        "Sell one or more characters from your inventory.\n"
+        "Usage: *sell <slot ...|all|max>\n"
+        "Examples: *sell 1 | *sell 1 3 5 | *sell all | *sell max\n"
+        "Slot numbers may be separated by spaces. all and max sell all characters."
+    ),
+    "sellplant": (
+        "Sell one or more grown plants, not seeds.\n"
+        "Usage: *sellplant <slot ...|all|max>\n"
+        "Examples: *sellplant 1 | *sellplant 1 3 5 | *sellplant all\n"
+        "all and max sell all grown plants, leaving seeds in your inventory."
+    ),
+    "setDefender": (
+        "Choose a character as your combat defender.\n"
+        "Usage: *setDefender <character_slot>\n"
+        "Example: *setDefender 2"
+    ),
+    "shop": "Browse the seed shop and buy seeds using its buttons.\nUsage: *shop",
+    "train": (
+        "Train one character (one-hour user cooldown).\n"
+        "Usage: *train <character_slot>\nExample: *train 1"
+    ),
+    "water": (
+        "Water plants or germinate seeds in your plant inventory.\n"
+        "Usage: *water <slot ...|all|max>\n"
+        "Examples: *water 1 | *water 1 3 5 | *water all\n"
+        "all and max process every slot. A plant can only be watered once per day."
+    ),
+    "work": "Earn a small reward (one-minute user cooldown).\nUsage: *work",
+}
+
+for command_name, description in COMMAND_HELP.items():
+    command = bot.get_command(command_name)
+    if command is not None:
+        command.help = description
+        command.brief = description.splitlines()[0]
+
 
 @bot.event
 async def on_ready():

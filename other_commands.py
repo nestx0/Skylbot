@@ -12,6 +12,13 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 bot = commands.Bot(command_prefix="*", intents=intents)
+bot.help_command = commands.DefaultHelpCommand(
+    sort_commands=True,
+    command_attrs={
+        "help": "Show the command list or detailed examples.\nUsage: *help [command]\nExamples: *help | *help pull | *help sellplant",
+        "brief": "Show command syntax and examples",
+    },
+)
 
 mio_estado = {"activo": False, "reclamado": False}
 
@@ -20,16 +27,27 @@ async def guide(ctx):
 
     lines = []
     for cmd in sorted(bot.commands, key=lambda cmd: cmd.name.lower()):
-        signature = f"{cmd.signature}" if cmd.signature else ""
-        description = cmd.help or "No description yet"
-        lines.append(f"• **{cmd.name} {signature}** -   {description}")
-    listado = "\n".join(lines)
+        signature = f" {cmd.signature}" if cmd.signature else ""
+        description = cmd.short_doc or "No description yet"
+        lines.append(f"• **{cmd.name}{signature}** - {description}")
 
-    embed = discord.Embed(
-        title="Commands", description=listado, color=discord.Color.green()
-    )
+    # Keep *guide concise; detailed examples are available via *help <command>.
+    pages = []
+    current = ""
+    for line in lines:
+        if current and len(current) + len(line) + 1 > 3900:
+            pages.append(current)
+            current = ""
+        current += ("\n" if current else "") + line
+    if current:
+        pages.append(current)
 
-    await ctx.send(embed=embed)
+    for index, page in enumerate(pages or ["No commands available."]):
+        suffix = f" ({index + 1}/{len(pages)})" if len(pages) > 1 else ""
+        embed = discord.Embed(
+            title=f"Commands{suffix}", description=page, color=discord.Color.green()
+        )
+        await ctx.send(embed=embed)
 
 
 async def ping(ctx):
